@@ -1,0 +1,148 @@
+/* ── Signature background pattern (fashion line-art, tiled) ── */
+/* Home page only — body pattern shows through #view-home since it has no
+   opaque background of its own. Every other view (#view-cart, #view-product,
+   #view-profile, #admin-stage, #view-listing, etc.) keeps its solid legacy
+   background color, which naturally blocks the pattern — nothing extra needed. */
+body {
+  background-image: url('/patterns/fashion-tile.svg'), linear-gradient(180deg, #fafaf8 0%, #fafaf8 100%);
+  background-repeat: repeat, no-repeat;
+  background-size: 240px 240px, auto;
+}
+
+/* .section applies a translucent white wash (originally tuned to soften the
+   old colorful emoji wallpaper) that was almost fully hiding the new,
+   much subtler line-art pattern underneath it. Lighten it so the pattern
+   still reads inside content sections, not just the outer page margins. */
+.section {
+  background: rgba(250, 250, 248, 0.12);
+}
+#pill-strip {
+  background: rgba(250, 250, 248, 0.12);
+}
+
+/* Cards/panels stay clean solid white so the pattern reads only in open space */
+.mmb-hero-card,
+.mmb-mood-cell,
+.mmb-prod-card-img,
+.mmb-quiz-card,
+.mmb-cat-item-img,
+.mmb-drawer,
+.mmb-coupon-banner {
+  background-color: #fff;
+}
+
+/* Horizontally-scrolling photo strips (hero carousel, product carousels) should
+   read as a clean gallery, not have the pattern poking through the card gaps
+   right next to real photography — mask it with the page base color there. */
+.mmb-hero-scroll,
+.mmb-prod-scroll,
+.mmb-cat-strip,
+.mood-row {
+  background-color: #fafaf8;
+}
+
+/* ── Toasts ─────────────────────────────────────────────── */
+.mb-toast-stack {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+.mb-toast {
+  background: #131722;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 8px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.32);
+  animation: mb-toast-in 0.2s ease;
+}
+.mb-toast-error { background: #d23b3b; }
+.mb-toast-info { background: #333; }
+@keyframes mb-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modal shell ────────────────────────────────────────── */
+.mb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 15, 0.55);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mb-modal {
+  background: #fff;
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 4px;
+}
+
+/* ── Loading / error / empty states ────────────────────── */
+.mb-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  text-align: center;
+  color: #888;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+.mb-spinner {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #e5e5e5;
+  border-top-color: #1a1a2e;
+  border-radius: 50%;
+  animation: mb-spin 0.7s linear infinite;
+}
+@keyframes mb-spin {
+  to { transform: rotate(360deg); }
+}
+.mb-state-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #1a1a2e;
+}
+.mb-state-subtitle {
+  font-size: 13px;
+  color: #999;
+  max-width: 320px;
+}
+.mb-state-retry {
+  border: 1px solid #1a1a2e;
+  background: none;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mb-state-retry:hover { background: #1a1a2e; color: #fff; }
+
+/* ── Page fade transition on route change ──────────────── */
+.mb-page-fade {
+  animation: mb-fade-in 0.25s ease;
+}
+@keyframes mb-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Admin route wrapper (admin lives at /profile/admin, full width) ── */
+#admin-stage { min-height: 300px; }
