@@ -13,7 +13,7 @@ import type { CartItem } from '../../../types';
 
 export function CartPage() {
   useBodyViewClass('cart');
-  const { cart, updateQty, removeItem, applyPromoCode, refresh } = useCart();
+  const { cart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh } = useCart();
   const { toggleWishlist } = useWishlist();
   const toast = useToast();
   const navigate = useNavigate();
@@ -102,6 +102,7 @@ export function CartPage() {
             <PriceSummary
               cart={cart}
               onApplyPromo={applyPromoCode}
+              onRemovePromo={removePromoCode}
               onCheckout={handleCheckout}
               checkingOut={checkingOut}
             />

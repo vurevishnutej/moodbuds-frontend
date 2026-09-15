@@ -30,7 +30,9 @@ export function AdminHub() {
 export function AdminLayout() {
   return (
     <div id="admin-stage">
-      <Outlet />
+      <div id="panel-admin">
+        <Outlet />
+      </div>
     </div>
   );
 }

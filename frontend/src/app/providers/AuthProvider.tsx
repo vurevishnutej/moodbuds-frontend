@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { authService, type AuthResponse, type CustomerInfo } from '../../services/auth/authService';
+import { authService, type CustomerInfo } from '../../services/auth/authService';
 import { useToast } from './ToastProvider';
 
 interface AuthContextValue {
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (storedCustomer) {
             try {
               setCustomer(JSON.parse(storedCustomer));
-            } catch (err) {
+            } catch {
               console.debug('Could not parse stored customer data');
             }
           }

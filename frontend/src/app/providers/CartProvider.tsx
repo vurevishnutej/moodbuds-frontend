@@ -12,6 +12,7 @@ interface CartContextValue {
   updateQty: (itemId: string, qty: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   applyPromoCode: (code: string) => Promise<boolean>;
+  removePromoCode: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -65,17 +66,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setCart(next);
         toast.success(`${code.toUpperCase()} applied`);
         return true;
-      } catch {
-        toast.error('Invalid promo code');
+      } catch (error) {
+        let text='That code did not quite fit. Check it and try again.';
+        if(error instanceof Error){try{const body=JSON.parse(error.message) as {detail?:string;message?:string};text=body.detail||body.message||text;}catch{/* friendly fallback */}}
+        toast.error(text);
         return false;
       }
     },
     [toast]
   );
 
+  const removePromoCode = useCallback(async () => {
+    const next=await cartService.removePromoCode(); setCart(next); toast.info('Coupon removed');
+  },[toast]);
+
   const value = useMemo(
-    () => ({ cart, loading, addToCart, updateQty, removeItem, applyPromoCode, refresh }),
-    [cart, loading, addToCart, updateQty, removeItem, applyPromoCode, refresh]
+    () => ({ cart, loading, addToCart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh }),
+    [cart, loading, addToCart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

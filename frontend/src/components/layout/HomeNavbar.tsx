@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MOODS } from '../../data/moods';
+import { useMoods } from '../../features/moods/hooks/useMoods';
 import { capitalize } from '../../utils/format';
 import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
@@ -26,6 +26,7 @@ export function HomeNavbar() {
   const { items: wishlistItems } = useWishlist();
   const quiz = useQuizModal();
   const { isAuthenticated } = useAuth();
+  const { moods } = useMoods();
 
   useEffect(() => {
     const t = setInterval(() => setTaglineIdx((i) => (i + 1) % TAGLINES.length), 2800);
@@ -82,7 +83,7 @@ export function HomeNavbar() {
         </div>
       </div>
       <div className="nav-row2" id="home-mood-tabs-row">
-        {MOODS.map((m) => (
+        {moods.map((m) => (
           <Link
             key={m.id}
             to={`/mood/${m.id}`}

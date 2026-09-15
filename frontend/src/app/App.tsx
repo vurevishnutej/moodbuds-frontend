@@ -5,6 +5,7 @@ import { AuthProvider } from './providers/AuthProvider';
 import { CartProvider } from './providers/CartProvider';
 import { WishlistProvider } from './providers/WishlistProvider';
 import { QuizProvider } from './providers/QuizProvider';
+import { MoodProvider } from './providers/MoodProvider';
 import { AppRoutes } from './routes';
 import { QuizModal } from '../features/quiz/components/QuizModal';
 
@@ -21,15 +22,17 @@ export function App() {
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <QuizProvider>
-                <ScrollToTop />
-                <AppRoutes />
-                <QuizModal />
-              </QuizProvider>
-            </WishlistProvider>
-          </CartProvider>
+          <MoodProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <QuizProvider>
+                  <ScrollToTop />
+                  <AppRoutes />
+                  <QuizModal />
+                </QuizProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </MoodProvider>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>

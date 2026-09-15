@@ -3,9 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import { ListingHeader } from '../../../components/layout/ListingHeader';
 import { Footer } from '../../../components/layout/Footer';
 import { LoadingState, ErrorState } from '../../../components/common/States';
-import { getMoodById } from '../../../data/moods';
+import { useMood } from '../../moods/hooks/useMoods';
 import { MOOD_MATERIAL } from '../../../data/moodPalette';
 import { useMoodPalette } from '../../moods/hooks/useMoodPalette';
+import { moodBannerUrl, useFallbackMoodImage } from '../../moods/utils/moodBanner';
 import { useBodyViewClass } from '../../../hooks/useBodyViewClass';
 import { useProducts } from '../hooks/useProducts';
 import { ProductGrid } from '../components/ProductGrid';
@@ -17,7 +18,7 @@ import type { MoodId, ProductQuery } from '../../../types';
 export function ProductListingPage() {
   useBodyViewClass('listing');
   const { moodId } = useParams<{ moodId: string }>();
-  const mood = getMoodById(moodId ?? '');
+  const { mood, loading: moodLoading, error: moodError } = useMood(moodId);
   const [sort, setSort] = useState<NonNullable<ProductQuery['sort']>>('new');
   const [columns, setColumns] = useState<2 | 3 | 4>(4);
   const [filters, setFilters] = useState<ListingFilters>({ onSale: false, isNew: false, sizes: [] });
@@ -37,10 +38,12 @@ export function ProductListingPage() {
 
   const { products, loading, error, refetch } = useProducts(query);
 
+  if (moodLoading) return <LoadingState label="Finding your mood…" />;
+
   if (!mood) {
     return (
       <div id="not-found">
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, marginBottom: 12 }}>Mood not found</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, marginBottom: 12 }}>{moodError ? 'Moods are taking a breather' : 'This mood is not available'}</h2>
         <p>
           <Link to="/" style={{ color: 'var(--mood-accent)' }}>← Back to home</Link>
         </p>
@@ -56,7 +59,13 @@ export function ProductListingPage() {
         <ListingHeader activeMoodId={mood.id} />
 
         <div id="listing-hero">
-          <img id="listing-hero-img" src={mood.image} alt={mood.title} loading="eager" />
+          <img
+            id="listing-hero-img"
+            src={moodBannerUrl(mood.id)}
+            alt={mood.title}
+            loading="eager"
+            onError={(event) => mood.image ? useFallbackMoodImage(event, mood.image) : event.currentTarget.remove()}
+          />
           <div id="listing-hero-overlay" />
           <div id="listing-hero-content">
             <span id="listing-hero-kicker">Mood Edit · {capitalize(mood.id)}</span>

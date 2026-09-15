@@ -113,7 +113,7 @@ export function getMoodById(id: string): Mood | undefined {
 }
 
 /** Transition-screen quotes, shown briefly while navigating into a mood. */
-export const MOOD_QUOTES: Record<MoodId, string> = {
+export const MOOD_QUOTES: Record<string, string> = {
   happy: 'Happiness is not a mood.\nIt is a wardrobe choice.',
   confident: 'Dress like the outcome\nis already decided.',
   cool: 'The less you try,\nthe better you look.',

@@ -27,7 +27,7 @@ export function AdminStats({ items }: { items: { label: string; value: string | 
 }
 
 const BADGE_COLOR: Record<string, string> = {
-  Active: 'green', 'Out of stock': 'red', 'Low stock': 'amber', New: 'blue', Processing: 'amber',
+  Active: 'green', 'In stock': 'green', 'Out of stock': 'red', 'Low stock': 'amber', Disabled: 'gray', New: 'blue', Processing: 'amber',
   Shipped: 'blue', Delivered: 'green', Cancelled: 'red', Paid: 'green', COD: 'gray', Refunded: 'red',
   Pending: 'amber', Approved: 'green', Rejected: 'red', Scheduled: 'blue', Draft: 'gray', Expired: 'red',
 };

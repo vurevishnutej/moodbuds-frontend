@@ -1,160 +1,106 @@
-import type { MoodId, QuizResult } from '../../../types';
 import { apiClient } from '../../../services/api/apiClient';
 
-/**
- * Backend Quiz Configuration Response
- */
-interface QuizConfigResponse {
-  questions: QuizQuestion[];
-  moods: string[];
-  sessionTimeout: number;
-}
-
-/**
- * Backend Quiz Question
- */
-interface QuizQuestion {
+export interface QuizOptionResponse {
   id: number;
+  key: string;
   text: string;
-  options: QuizOption[];
-  order: number;
+  sortOrder: number;
 }
 
-/**
- * Backend Quiz Option
- */
-interface QuizOption {
+export interface QuizQuestionResponse {
   id: number;
-  text: string;
   order: number;
-  weights: Record<string, number>; // mood: weight
+  text: string;
+  options: QuizOptionResponse[];
 }
 
-/**
- * Backend Quiz Session Response
- */
-interface QuizSessionResponse {
+export interface QuizConfigResponse {
+  totalQuestions: number;
+  branchQuestionCount: number;
+  universalQuestionCount: number;
+  sessionValidityHours: number;
+}
+
+export interface QuizProgressResponse {
   sessionId: string;
+  status: 'IN_PROGRESS' | 'READY_TO_COMPLETE' | 'COMPLETED';
+  answeredQuestions: number;
+  totalQuestions: number;
+  progressPercent: number;
+  startedAt: string;
+  completedAt?: string;
+  nextQuestion?: QuizQuestionResponse;
+}
+
+export interface CreateQuizSessionResponse extends QuizProgressResponse {
   sessionToken: string;
-  createdAt: string;
-  expiresAt: string;
 }
 
-/**
- * Backend Quiz Result Response
- */
-interface QuizResultResponse {
+export interface QuizMoodResult {
+  id: number;
+  name: string;
+  slug: string;
+  tagline?: string;
+  personalityTagline?: string;
+  bannerImageUrl?: string;
+  color?: string;
+}
+
+export interface QuizResultResponse {
   sessionId: string;
-  recommendedMood: string;
-  scores: Record<string, number>;
-  recommendations: string[];
+  status: 'COMPLETED';
+  completedAt: string;
+  mood: QuizMoodResult;
+  scoreBreakdown: Array<{ moodId: number; name: string; slug: string; score: number }>;
+  recommendedProducts: Array<{
+    id: number;
+    sku: string;
+    slug: string;
+    name: string;
+    price: number;
+    discountPrice?: number;
+    primaryImageUrl?: string;
+    availableStock: number;
+  }>;
 }
 
-/**
- * Real HTTP Quiz API implementation
- */
+const anonymousQuizRequest = { includeAuth: false } as const;
+
 export const httpQuizApi = {
-  /**
-   * GET /quiz/config - Get quiz configuration and questions
-   */
-  async getConfig(): Promise<QuizConfigResponse> {
-    try {
-      return await apiClient.get<QuizConfigResponse>('/quiz/config');
-    } catch (error) {
-      console.error('Failed to fetch quiz config:', error);
-      throw error;
-    }
-  },
+  getConfig: () => apiClient.get<QuizConfigResponse>('/quiz/config', anonymousQuizRequest),
 
-  /**
-   * POST /quiz/sessions - Create a new quiz session
-   */
-  async createSession(): Promise<QuizSessionResponse> {
-    try {
-      return await apiClient.post<QuizSessionResponse>('/quiz/sessions', {});
-    } catch (error) {
-      console.error('Failed to create quiz session:', error);
-      throw error;
-    }
-  },
+  createSession: () =>
+    apiClient.post<CreateQuizSessionResponse>('/quiz/sessions', {}, anonymousQuizRequest),
 
-  /**
-   * GET /quiz/sessions/{sessionId}/question - Get next question
-   */
-  async getNextQuestion(sessionId: string, sessionToken: string): Promise<QuizQuestion> {
-    try {
-      return await apiClient.get<QuizQuestion>(
-        `/quiz/sessions/${sessionId}/question`,
-        {
-          headers: { 'X-Quiz-Session-Token': sessionToken },
-        }
-      );
-    } catch (error) {
-      console.error('Failed to fetch next question:', error);
-      throw error;
-    }
-  },
+  getProgress: (sessionId: string, sessionToken: string) =>
+    apiClient.get<QuizProgressResponse>(`/quiz/sessions/${sessionId}`, {
+      ...anonymousQuizRequest,
+      headers: { 'X-Quiz-Session-Token': sessionToken },
+    }),
 
-  /**
-   * POST /quiz/sessions/{sessionId}/answers - Submit an answer
-   */
-  async submitAnswer(
-    sessionId: string,
-    sessionToken: string,
-    optionId: number
-  ): Promise<any> {
-    try {
-      return await apiClient.post(
-        `/quiz/sessions/${sessionId}/answers`,
-        { optionId },
-        {
-          headers: { 'X-Quiz-Session-Token': sessionToken },
-        }
-      );
-    } catch (error) {
-      console.error('Failed to submit answer:', error);
-      throw error;
-    }
-  },
+  submitAnswer: (sessionId: string, sessionToken: string, questionId: number, optionId: number) =>
+    apiClient.post<QuizProgressResponse>(
+      `/quiz/sessions/${sessionId}/answers`,
+      { questionId, optionId },
+      {
+        ...anonymousQuizRequest,
+        headers: { 'X-Quiz-Session-Token': sessionToken },
+      },
+    ),
 
-  /**
-   * POST /quiz/sessions/{sessionId}/complete - Complete quiz
-   */
-  async completeQuiz(
-    sessionId: string,
-    sessionToken: string
-  ): Promise<QuizResultResponse> {
-    try {
-      return await apiClient.post(
-        `/quiz/sessions/${sessionId}/complete`,
-        {},
-        {
-          headers: { 'X-Quiz-Session-Token': sessionToken },
-        }
-      );
-    } catch (error) {
-      console.error('Failed to complete quiz:', error);
-      throw error;
-    }
-  },
+  completeQuiz: (sessionId: string, sessionToken: string) =>
+    apiClient.post<QuizResultResponse>(
+      `/quiz/sessions/${sessionId}/complete`,
+      {},
+      {
+        ...anonymousQuizRequest,
+        headers: { 'X-Quiz-Session-Token': sessionToken },
+      },
+    ),
 
-  /**
-   * GET /quiz/sessions/{sessionId}/result - Get quiz result
-   */
-  async getResult(
-    sessionId: string,
-    sessionToken: string
-  ): Promise<QuizResultResponse> {
-    try {
-      return await apiClient.get<QuizResultResponse>(
-        `/quiz/sessions/${sessionId}/result`,
-        {
-          headers: { 'X-Quiz-Session-Token': sessionToken },
-        }
-      );
-    } catch (error) {
-      console.error('Failed to fetch quiz result:', error);
-      throw error;
-    }
-  },
+  getResult: (sessionId: string, sessionToken: string) =>
+    apiClient.get<QuizResultResponse>(`/quiz/sessions/${sessionId}/result`, {
+      ...anonymousQuizRequest,
+      headers: { 'X-Quiz-Session-Token': sessionToken },
+    }),
 };

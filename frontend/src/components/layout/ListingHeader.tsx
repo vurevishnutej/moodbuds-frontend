@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MOODS } from '../../data/moods';
+import { useMoods } from '../../features/moods/hooks/useMoods';
 import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
 import { SearchIcon } from '../common/Icons';
@@ -12,6 +12,7 @@ export function ListingHeader({ activeMoodId }: { activeMoodId?: string }) {
   const { cart } = useCart();
   const { items: wishlistItems } = useWishlist();
   const cartCount = cart.items.reduce((s, i) => s + i.qty, 0);
+  const { moods } = useMoods();
 
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +61,7 @@ export function ListingHeader({ activeMoodId }: { activeMoodId?: string }) {
       </div>
       <div className="mood-strip">
         <div className="mood-strip-inner">
-          {MOODS.map((m) => (
+          {moods.map((m) => (
             <Link
               key={m.id}
               to={`/mood/${m.id}`}

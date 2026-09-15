@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { MOODS } from '../../data/moods';
+import { useMoods } from '../../features/moods/hooks/useMoods';
+import { moodBannerBackground } from '../../features/moods/utils/moodBanner';
 import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
 import { useQuizModal } from '../../app/providers/QuizProvider';
@@ -16,7 +17,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { items: wishlistItems } = useWishlist();
   const quiz = useQuizModal();
   const cartCount = cart.items.reduce((s, i) => s + i.qty, 0);
-  const bannerMood = MOODS.find((m) => m.id === 'party') ?? MOODS[0];
+  const { moods } = useMoods();
+  const bannerMood = moods.find((m) => m.id === 'party') ?? moods[0];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -42,7 +44,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       <div className="mmb-drawer" role="dialog" aria-modal="true" aria-label="Menu">
         <div
           className="mmb-drawer-banner"
-          style={{ backgroundImage: `url(${bannerMood.image.replace('w=1400', 'w=700')})` }}
+          style={{ backgroundImage: bannerMood ? moodBannerBackground(bannerMood) : undefined }}
         >
           <span className="mmb-drawer-banner-ribbon">₹300 OFF</span>
           <button type="button" className="mmb-drawer-close" aria-label="Close menu" onClick={onClose}>
@@ -59,7 +61,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <Link to="/" className="mmb-drawer-link" onClick={onClose}>
           Home <span className="chev">›</span>
         </Link>
-        <Link to="/mood/happy" className="mmb-drawer-link" onClick={onClose}>
+        <Link to={moods[0] ? `/mood/${moods[0].id}` : '/'} className="mmb-drawer-link" onClick={onClose}>
           Shop by Mood <span className="chev">›</span>
         </Link>
         <Link to="/wishlist" className="mmb-drawer-link" onClick={onClose}>

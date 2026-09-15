@@ -5,11 +5,12 @@ import { formatINR } from '../../../utils/format';
 interface PriceSummaryProps {
   cart: Cart;
   onApplyPromo: (code: string) => Promise<boolean>;
+  onRemovePromo: () => Promise<void>;
   onCheckout: () => void;
   checkingOut: boolean;
 }
 
-export function PriceSummary({ cart, onApplyPromo, onCheckout, checkingOut }: PriceSummaryProps) {
+export function PriceSummary({ cart, onApplyPromo, onRemovePromo, onCheckout, checkingOut }: PriceSummaryProps) {
   const [promoInput, setPromoInput] = useState('');
   const [applying, setApplying] = useState(false);
 
@@ -56,8 +57,8 @@ export function PriceSummary({ cart, onApplyPromo, onCheckout, checkingOut }: Pr
           onChange={(e) => setPromoInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleApply()}
         />
-        <button type="button" onClick={handleApply} disabled={!!cart.promoCode || applying}>
-          {cart.promoCode ? '✓' : 'Apply'}
+        <button type="button" onClick={cart.promoCode ? () => void onRemovePromo() : handleApply} disabled={applying}>
+          {cart.promoCode ? 'Remove' : 'Apply'}
         </button>
       </div>
 

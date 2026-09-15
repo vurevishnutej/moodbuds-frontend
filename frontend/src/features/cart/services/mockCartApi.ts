@@ -101,6 +101,12 @@ export const mockCartApi: CartApi = {
     return computeCart();
   },
 
+  async removePromoCode() {
+    writePromo(null);
+    await delay();
+    return computeCart();
+  },
+
   async clearCart() {
     await delay(150);
     writeItems([]);

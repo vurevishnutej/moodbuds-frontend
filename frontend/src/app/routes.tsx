@@ -14,6 +14,8 @@ import { OrdersPage } from '../features/profile/pages/OrdersPage';
 import { AddressesPage } from '../features/profile/pages/AddressesPage';
 import { CouponsPage } from '../features/profile/pages/CouponsPage';
 import { ContactPage } from '../features/profile/pages/ContactPage';
+import { AboutUsPage } from '../features/content/pages/AboutUsPage';
+import { ContactUsPage } from '../features/content/pages/ContactUsPage';
 import { AdminLayout, AdminHub } from '../features/admin/pages/AdminLayout';
 import { EditProductsPage } from '../features/admin/pages/EditProductsPage';
 import { CreateProductPage } from '../features/admin/pages/CreateProductPage';
@@ -46,6 +48,8 @@ export function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/about-us" element={<AboutUsPage />} />
+      <Route path="/contact-us" element={<ContactUsPage />} />
 
       {/* Product Routes */}
       <Route path="/mood/:moodId" element={<ProductListingPage />} />

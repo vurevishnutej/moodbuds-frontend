@@ -3,19 +3,11 @@
  * These represent the shape of data the (future) backend API will return.
  */
 
-export type MoodId =
-  | 'happy'
-  | 'confident'
-  | 'cool'
-  | 'professional'
-  | 'party'
-  | 'energetic'
-  | 'romantic'
-  | 'calm'
-  | 'minimal';
+export type MoodId = string;
 
 export interface Mood {
   id: MoodId;
+  backendId?: number;
   emoji: string;
   title: string;
   subtitle: string;
@@ -24,6 +16,8 @@ export interface Mood {
   brand: string;
   offer: string;
   gradeOverlay: string;
+  displayOrder?: number;
+  productCount?: number;
 }
 
 export interface ProductTag {

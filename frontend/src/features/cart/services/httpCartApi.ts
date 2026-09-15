@@ -4,27 +4,23 @@ import type { CartApi, CheckoutApi } from './cartApi';
 
 interface CartItemResponse {
   id: number;
-  productId: string;
-  name: string;
-  brand: string;
-  price: number;
-  originalPrice?: number;
+  productId: number;
+  productSlug: string;
+  productName: string;
+  primaryImageUrl: string;
+  currentUnitPrice: number;
+  effectiveUnitPrice: number;
   quantity: number;
   size: string;
-  color?: string;
-  image: string;
-  moodId: string;
 }
 
 interface CartResponse {
+  cartId: number;
   items: CartItemResponse[];
-  subtotal: number;
-  gstAmount: number;
-  deliveryCharge: number;
-  discount: number;
-  total: number;
-  appliedCoupon?: string;
+  totals: { mrpSubtotal:number; productDiscount:number; sellingSubtotal:number; gstAmount:number; grandTotal:number };
 }
+
+interface CouponCartResponse { applied:boolean; coupon?:{code:string}|null; totals:{productDiscount:number;sellingSubtotal:number;couponDiscount:number;grandTotal:number}; cart:CartResponse; }
 
 interface AddCartItemRequest {
   productSlug: string;
@@ -33,7 +29,7 @@ interface AddCartItemRequest {
   quantity: number;
 }
 
-interface UpdateCartItemRequest {
+interface UpdateCartItemPayload {
   quantity?: number;
   size?: string;
 }
@@ -41,27 +37,26 @@ interface UpdateCartItemRequest {
 /**
  * Convert API CartResponse to frontend Cart format
  */
-function mapCartResponse(response: CartResponse): Cart {
+function mapCartResponse(response: CartResponse, coupon?: CouponCartResponse): Cart {
   return {
     items: response.items.map(item => ({
       id: String(item.id),
-      productId: item.productId,
-      name: item.name,
-      brand: item.brand,
-      price: item.price,
-      originalPrice: item.originalPrice || null,
+      productId: item.productSlug || String(item.productId),
+      name: item.productName,
+      brand: '',
+      price: item.effectiveUnitPrice / 100,
+      originalPrice: item.currentUnitPrice > item.effectiveUnitPrice ? item.currentUnitPrice / 100 : null,
       qty: item.quantity,
       size: item.size,
-      color: item.color || null,
-      image: item.image,
-      moodId: item.moodId,
+      color: null,
+      image: item.primaryImageUrl,
     })) as CartItem[],
-    subtotal: response.subtotal,
-    savings: 0, // Calculate from originalPrice
-    delivery: response.deliveryCharge,
-    discount: response.discount,
-    total: response.total,
-    promoCode: response.appliedCoupon || null,
+    subtotal: (coupon?.totals.sellingSubtotal ?? response.totals.sellingSubtotal) / 100,
+    savings: (coupon?.totals.productDiscount ?? response.totals.productDiscount) / 100,
+    delivery: 0,
+    discount: (coupon?.totals.couponDiscount ?? 0) / 100,
+    total: (coupon?.totals.grandTotal ?? response.totals.grandTotal) / 100,
+    promoCode: coupon?.coupon?.code || null,
   };
 }
 
@@ -96,7 +91,7 @@ export const httpCartApi: CartApi = {
    * PATCH /customer/cart/items/{itemId} - Update cart item
    */
   async updateCartItem(request: UpdateCartItemRequest): Promise<Cart> {
-    const payload: UpdateCartItemRequest = {};
+    const payload: UpdateCartItemPayload = {};
     if (request.qty !== undefined) payload.quantity = request.qty;
     if (request.itemId !== undefined) {
       // itemId is in the request but used in URL
@@ -118,19 +113,22 @@ export const httpCartApi: CartApi = {
   },
 
   /**
-   * POST /customer/cart - Apply promo code
-   * Note: Need to check actual endpoint for applying coupon
+   * POST /customer/cart/coupon - Apply promo code
    */
   async applyPromoCode(code: string): Promise<Cart> {
     try {
-      // This endpoint might need adjustment based on actual API
-      const response = await apiClient.post<CartResponse>('/customer/cart/apply-coupon', {
+      const response = await apiClient.post<CouponCartResponse>('/customer/cart/coupon', {
         code,
       });
-      return mapCartResponse(response);
+      return mapCartResponse(response.cart, response);
     } catch (error) {
-      throw new Error(`Invalid promo code: ${code}`);
+      throw error;
     }
+  },
+
+  async removePromoCode(): Promise<Cart> {
+    const response = await apiClient.delete<CouponCartResponse>('/customer/cart/coupon');
+    return mapCartResponse(response.cart, response);
   },
 
   /**
@@ -146,7 +144,7 @@ export const httpCartApi: CartApi = {
  * Checkout API for placing orders
  */
 export const httpCheckoutApi: CheckoutApi = {
-  async checkout(cart: Cart) {
+  async checkout(_cart: Cart) {
     // This would be handled by the order API
     return {
       success: true,
