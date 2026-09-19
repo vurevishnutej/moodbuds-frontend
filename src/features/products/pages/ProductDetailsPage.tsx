@@ -30,6 +30,7 @@ export function ProductDetailsPage() {
   const [size, setSize] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
+  const [imageIdx, setImageIdx] = useState(0);
 
   if (loading) return <LoadingState label="Loading product…" />;
   if (error) return <ErrorState message={error} />;
@@ -60,14 +61,46 @@ export function ProductDetailsPage() {
 <div className="mb-mobile-shell">
         <MobileNavbar />
         <div style={{ paddingBottom: '16px' }}>
-          {/* Product Image */}
-          {product.image && (
-            <img
-              src={product.image}
-              alt={product.name}
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-            />
-          )}
+          {/* Product Image Carousel */}
+          <div style={{ position: 'relative', width: '100%', backgroundColor: '#f5f5f5' }}>
+            {product.image && (
+              <img
+                src={product.image}
+                alt={product.name}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
+              />
+            )}
+
+            {/* Image Dots Indicator */}
+            <div style={{
+              position: 'absolute',
+              bottom: '12px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: '6px',
+              zIndex: 10,
+            }}>
+              {[0, 1, 2].map((i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setImageIdx(i)}
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: imageIdx === i ? '#8b3a52' : 'rgba(255,255,255,0.6)',
+                    cursor: 'pointer',
+                    padding: 0,
+                    transition: 'all 0.3s ease',
+                  }}
+                  aria-label={`Image ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
 
           <div style={{ padding: '16px' }}>
             {/* Brand and Name */}
