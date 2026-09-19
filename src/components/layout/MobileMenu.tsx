@@ -7,6 +7,8 @@ import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
 import { useQuizModal } from '../../app/providers/QuizProvider';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { useHomepageCoupon } from '../../features/coupons/hooks/useHomepageCoupon';
+import { couponOffer } from '../../features/coupons/services/couponService';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { moods } = useMoods();
   const bannerMood = moods.find((m) => m.id === 'party') ?? moods[0];
   const { isAuthenticated, customer, logout } = useAuth();
+  const homepageCoupon = useHomepageCoupon();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -48,16 +51,20 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           className="mmb-drawer-banner"
           style={{ backgroundImage: bannerMood ? moodBannerBackground(bannerMood) : undefined }}
         >
-          <span className="mmb-drawer-banner-ribbon">₹300 OFF</span>
-          <button type="button" className="mmb-drawer-close" aria-label="Close menu" onClick={onClose}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-          <div className="mmb-drawer-banner-text">
-            Flat ₹300 off your first order
-            <span>Use code MOOD300 at checkout</span>
-          </div>
+          {homepageCoupon && (
+            <>
+              <span className="mmb-drawer-banner-ribbon">{couponOffer(homepageCoupon)}</span>
+              <button type="button" className="mmb-drawer-close" aria-label="Close menu" onClick={onClose}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+              <div className="mmb-drawer-banner-text">
+                {couponOffer(homepageCoupon)} on your first order
+                <span>Use code {homepageCoupon.code} at checkout</span>
+              </div>
+            </>
+          )}
         </div>
 
         <Link to="/" className="mmb-drawer-link" onClick={onClose}>
