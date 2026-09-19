@@ -24,12 +24,14 @@ export interface CustomerInfo {
   email: string;
   firstName: string;
   lastName: string;
-  mobile?: string | null;
-  dateOfBirth?: string | null;
-  gender?: 'M' | 'F' | 'OTHER' | 'UNSPECIFIED';
-  emailVerified?: boolean;
-  mobileVerified?: boolean;
-  active?: boolean;
+  mobile: string | null;
+  dateOfBirth: string | null;
+  gender: 'M' | 'F' | 'OTHER' | 'UNSPECIFIED';
+  emailVerified: boolean;
+  mobileVerified: boolean;
+  active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UpdateProfileRequest {
