@@ -108,10 +108,10 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
                         disabled={page === 0}
                         onClick={() => setPage(page - 1)}
                       >
-                        ← Previous
+                        &lt;
                       </button>
                       <span className="pagination-info">
-                        Page <span className="page-number">{page + 1}</span> of <span className="total-pages">{totalPages}</span>
+                        <span className="page-number">{page + 1}</span> / <span className="total-pages">{totalPages}</span>
                       </span>
                       <button
                         type="button"
@@ -119,7 +119,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
                         disabled={page >= totalPages - 1}
                         onClick={() => setPage(page + 1)}
                       >
-                        Next →
+                        &gt;
                       </button>
                     </div>
                   </div>
