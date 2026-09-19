@@ -101,27 +101,27 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
 
                 {totalPages > 1 && (
                   <div className="reviews-pagination">
-                    <button
-                      type="button"
-                      className="pagination-btn prev"
-                      disabled={page === 0}
-                      onClick={() => setPage(page - 1)}
-                    >
-                      ← Previous
-                    </button>
-                    <span className="pagination-info">
-                      <span className="page-number">{page + 1}</span>
-                      <span className="page-separator">/</span>
-                      <span className="total-pages">{totalPages}</span>
-                    </span>
-                    <button
-                      type="button"
-                      className="pagination-btn next"
-                      disabled={page >= totalPages - 1}
-                      onClick={() => setPage(page + 1)}
-                    >
-                      Next →
-                    </button>
+                    <div className="pagination-controls">
+                      <button
+                        type="button"
+                        className="pagination-btn prev"
+                        disabled={page === 0}
+                        onClick={() => setPage(page - 1)}
+                      >
+                        ← Previous
+                      </button>
+                      <span className="pagination-info">
+                        Page <span className="page-number">{page + 1}</span> of <span className="total-pages">{totalPages}</span>
+                      </span>
+                      <button
+                        type="button"
+                        className="pagination-btn next"
+                        disabled={page >= totalPages - 1}
+                        onClick={() => setPage(page + 1)}
+                      >
+                        Next →
+                      </button>
+                    </div>
                   </div>
                 )}
               </>
