@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { apiClient } from '../../../services/api/apiClient';
 
 interface Review {
@@ -28,33 +28,67 @@ interface ProductReviewsSectionProps {
 
 export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductReviewsSectionProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [displayedCount, setDisplayedCount] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [totalElements, setTotalElements] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [allReviewsLoaded, setAllReviewsLoaded] = useState<Review[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const loadReviews = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await apiClient.get<ReviewsPageResponse>(`/products/${productSlug}/reviews?page=${page}&size=${pageSize}`);
-      setReviews(response.content);
-      setTotalPages(response.totalPages);
-      setTotalElements(response.totalElements);
-    } catch {
-      setError('Could not load reviews');
-    } finally {
-      setLoading(false);
+  const loadMoreReviews = async () => {
+    if (displayedCount === 0) {
+      // First load
+      setLoading(true);
+      setError(null);
+      try {
+        let page = 0;
+        let allReviews: Review[] = [];
+        let hasMorePages = true;
+
+        while (hasMorePages) {
+          const response = await apiClient.get<ReviewsPageResponse>(`/products/${productSlug}/reviews?page=${page}&size=${pageSize}`);
+          allReviews = [...allReviews, ...response.content];
+          hasMorePages = page + 1 < response.totalPages;
+          page++;
+        }
+
+        setAllReviewsLoaded(allReviews);
+        setTotalElements(allReviews.length);
+        setReviews(allReviews.slice(0, pageSize));
+        setDisplayedCount(pageSize);
+        setHasMore(allReviews.length > pageSize);
+      } catch {
+        setError('Could not load reviews');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Load more - slide up and show next batch
+      const nextCount = Math.min(displayedCount + pageSize, allReviewsLoaded.length);
+      setReviews(allReviewsLoaded.slice(0, nextCount));
+
+      // Smooth scroll animation
+      if (containerRef.current) {
+        containerRef.current.style.scrollBehavior = 'smooth';
+        containerRef.current.scrollTop = pageSize * 100;
+      }
+
+      setDisplayedCount(nextCount);
+      setHasMore(nextCount < allReviewsLoaded.length);
     }
   };
 
+  const loadMore = async () => {
+    await loadMoreReviews();
+  };
+
   useEffect(() => {
-    if (isOpen) {
-      void loadReviews();
+    if (isOpen && displayedCount === 0) {
+      void loadMoreReviews();
     }
-  }, [page, productSlug, pageSize, isOpen]);
+  }, [isOpen, productSlug, pageSize]);
 
   return (
     <div className="pd-accordion">
@@ -76,7 +110,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
               <div className="reviews-empty">No reviews yet. Be the first to review!</div>
             ) : (
               <>
-                <div className="reviews-list">
+                <div className="reviews-container" ref={containerRef}>
                   {reviews.map((review) => (
                     <div key={review.id} className="review-card">
                       <div className="review-header">
@@ -99,31 +133,19 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
                   ))}
                 </div>
 
-                {totalPages > 1 && (
-                  <div className="reviews-pagination">
-                    <div className="pagination-controls">
-                      <button
-                        type="button"
-                        className="pagination-btn prev"
-                        disabled={page === 0}
-                        onClick={() => setPage(page - 1)}
-                      >
-                        &lt;
-                      </button>
-                      <span className="pagination-info">
-                        <span className="page-number">{page + 1}</span> / <span className="total-pages">{totalPages}</span>
-                      </span>
-                      <button
-                        type="button"
-                        className="pagination-btn next"
-                        disabled={page >= totalPages - 1}
-                        onClick={() => setPage(page + 1)}
-                      >
-                        &gt;
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <div className="reviews-footer">
+                  <div className="reviews-count">Showing {reviews.length} of {totalElements} reviews</div>
+                  {hasMore && (
+                    <button
+                      type="button"
+                      className="load-more-btn"
+                      onClick={loadMore}
+                      disabled={loading}
+                    >
+                      {loading ? 'Loading...' : 'Load more'}
+                    </button>
+                  )}
+                </div>
               </>
             )}
           </div>
