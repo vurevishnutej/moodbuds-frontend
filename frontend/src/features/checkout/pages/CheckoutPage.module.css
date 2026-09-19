@@ -6,20 +6,35 @@
   position: relative;
 }
 
-/* Remove emoji backgrounds completely */
-#view-checkout .view-emoji-bg,
-#view-checkout [class*="emoji"],
-#view-checkout [class*="bg"] {
+/* Remove emoji backgrounds by hiding the container */
+#view-checkout .view-emoji-bg {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
-  z-index: -999 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+  z-index: -9999 !important;
 }
 
-/* Hide any pseudo-elements that might have emojis */
-#view-checkout::before,
-#view-checkout::after {
+/* Ensure checkout page covers any background */
+#view-checkout,
+#checkout-page {
+  background: #fff !important;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Hide any leftover emoji spans in background */
+#view-checkout .dp-far,
+#view-checkout .dp-mid,
+#view-checkout .dp-near {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 #checkout-page {
