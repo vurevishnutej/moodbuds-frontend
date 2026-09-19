@@ -80,6 +80,9 @@ export function HomeNavbar() {
               </Link>
             </>
           )}
+          <Link className="nav-action nav-admin-link" to="/admin">
+            <span className="nav-action-lbl">Admin</span>
+          </Link>
         </div>
       </div>
       <div className="nav-row2" id="home-mood-tabs-row">

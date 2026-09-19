@@ -19,7 +19,7 @@ export function CreateProductPage() {
         sub="Add a new piece to the catalog"
         actions={
           <>
-            <button type="button" className="adm-btn ghost" onClick={() => navigate('/profile/admin/edit-products')}>Cancel</button>
+            <button type="button" className="adm-btn ghost" onClick={() => navigate('/admin/edit-products')}>Cancel</button>
             <button type="button" className="adm-btn rose" onClick={() => toast.info('Product saved as draft')}>Save draft</button>
             <button type="button" className="adm-btn primary" onClick={() => toast.success('Product published ✦')}>Publish</button>
           </>

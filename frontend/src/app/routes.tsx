@@ -17,6 +17,8 @@ import { ContactPage } from '../features/profile/pages/ContactPage';
 import { AboutUsPage } from '../features/content/pages/AboutUsPage';
 import { ContactUsPage } from '../features/content/pages/ContactUsPage';
 import { AdminLayout, AdminHub } from '../features/admin/pages/AdminLayout';
+import { AdminLoginPage } from '../features/admin/pages/AdminLoginPage';
+import { AdminRoute, AdminGuestRoute, CustomerRoute, GuestRoute } from './RouteGuards';
 import { EditProductsPage } from '../features/admin/pages/EditProductsPage';
 import { CreateProductPage } from '../features/admin/pages/CreateProductPage';
 import { OrderListPage } from '../features/admin/pages/OrderListPage';
@@ -46,8 +48,8 @@ export function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+      <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
       <Route path="/about-us" element={<AboutUsPage />} />
       <Route path="/contact-us" element={<ContactUsPage />} />
 
@@ -57,10 +59,10 @@ export function AppRoutes() {
       <Route path="/search" element={<SearchResultsPage />} />
 
       {/* User Routes (Protected) */}
-      <Route path="/cart" element={<CartPage />} />
-      <Route path="/wishlist" element={<WishlistPage />} />
+      <Route path="/cart" element={<CustomerRoute><CartPage /></CustomerRoute>} />
+      <Route path="/wishlist" element={<CustomerRoute><WishlistPage /></CustomerRoute>} />
 
-      <Route path="/profile" element={<ProfileLayout />}>
+      <Route path="/profile" element={<CustomerRoute><ProfileLayout /></CustomerRoute>}>
         <Route index element={<ProfileOverviewPage />} />
         <Route path="info" element={<ProfileInfoPage />} />
         <Route path="orders" element={<OrdersPage />} />
@@ -68,7 +70,10 @@ export function AppRoutes() {
         <Route path="coupons" element={<CouponsPage />} />
         <Route path="contact" element={<ContactPage />} />
 
-        <Route path="admin" element={<AdminLayout />}>
+      </Route>
+
+      <Route path="/admin/login" element={<AdminGuestRoute><AdminLoginPage /></AdminGuestRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminHub />} />
           <Route path="edit-products" element={<EditProductsPage />} />
           <Route path="create-product" element={<CreateProductPage />} />
@@ -90,7 +95,6 @@ export function AppRoutes() {
           <Route path="coupons" element={<AdminCouponsPage />} />
           <Route path="admin-accounts" element={<AdminAccountsPage />} />
           <Route path="roles-permissions" element={<RolesPermissionsPage />} />
-        </Route>
       </Route>
 
       <Route path="*" element={<HomePage />} />

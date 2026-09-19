@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Cart, Product } from '../../types';
 import { cartService } from '../../features/cart/services/cartService';
 import { useToast } from './ToastProvider';
+import { useAuth } from './AuthProvider';
 
 const EMPTY_CART: Cart = { items: [], subtotal: 0, savings: 0, delivery: 0, discount: 0, total: 0, promoCode: null };
 
@@ -22,27 +23,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>(EMPTY_CART);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const { isAuthenticated, customer } = useAuth();
 
   const refresh = useCallback(async () => {
+    if (!isAuthenticated) { setCart(EMPTY_CART); return; }
     const next = await cartService.getCart();
     setCart(next);
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
+    if (!isAuthenticated) { setCart(EMPTY_CART); setLoading(false); return; }
     setLoading(true);
-    cartService
-      .getCart()
-      .then(setCart)
-      .finally(() => setLoading(false));
-  }, []);
+    cartService.getCart().then(setCart).catch(() => setCart(EMPTY_CART)).finally(() => setLoading(false));
+  }, [isAuthenticated, customer?.id]);
 
   const addToCart = useCallback(
     async (product: Product, size: string, color?: string | null, qty = 1) => {
+      if (!isAuthenticated) { toast.info('Please sign in to add items to your bag'); return; }
       const next = await cartService.addToCart({ product, size, color, qty });
       setCart(next);
       toast.success('Added to bag');
     },
-    [toast]
+    [isAuthenticated, toast]
   );
 
   const updateQty = useCallback(async (itemId: string, qty: number) => {

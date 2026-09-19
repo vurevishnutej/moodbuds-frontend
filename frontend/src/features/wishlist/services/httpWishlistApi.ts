@@ -4,13 +4,14 @@ import type { WishlistApi } from './wishlistApi';
 
 interface WishlistItemResponse {
   id: number;
-  productId: string;
+  productId: number;
+  productSlug: string;
   productName: string;
-  productBrand: string;
-  productImage: string;
+  primaryImageUrl: string;
   price: number;
-  originalPrice?: number;
-  size?: string;
+  discountPrice?: number | null;
+  effectivePrice: number;
+  selectedSize?: string | null;
   addedAt: string;
 }
 
@@ -19,19 +20,19 @@ interface WishlistResponse {
 }
 
 interface WishlistStatusResponse {
-  isWishlisted: boolean;
+  wishlisted: boolean;
 }
 
 function mapWishlistResponse(response: WishlistResponse): WishlistItem[] {
   return response.items.map((item) => ({
     id: String(item.id),
-    productId: item.productId,
+    productId: item.productSlug || String(item.productId),
     name: item.productName,
-    brand: item.productBrand,
-    price: item.price,
-    originalPrice: item.originalPrice ?? null,
-    sizes: item.size ? [item.size] : [],
-    image: item.productImage,
+    brand: '',
+    price: item.effectivePrice / 100,
+    originalPrice: item.discountPrice != null ? item.price / 100 : null,
+    sizes: item.selectedSize ? [item.selectedSize] : [],
+    image: item.primaryImageUrl,
     savedAt: Date.parse(item.addedAt) || Date.now(),
   }));
 }
@@ -42,15 +43,15 @@ export const httpWishlistApi: WishlistApi = {
   },
 
   async addToWishlist(product: Product) {
-    const response = await apiClient.post<WishlistResponse>('/customer/wishlist/items', {
+    await apiClient.post<WishlistItemResponse>('/customer/wishlist/items', {
       productSlug: product.id,
     });
-    return mapWishlistResponse(response);
+    return this.getWishlist();
   },
 
   async removeFromWishlist(itemId: string) {
-    const response = await apiClient.delete<WishlistResponse>(`/customer/wishlist/items/${itemId}`);
-    return mapWishlistResponse(response);
+    await apiClient.delete<void>(`/customer/wishlist/items/${itemId}`);
+    return this.getWishlist();
   },
 
   async isWishlisted(productId: string) {
@@ -59,7 +60,7 @@ export const httpWishlistApi: WishlistApi = {
       const response = await apiClient.get<WishlistStatusResponse>(
         `/customer/wishlist/status?${params.toString()}`,
       );
-      return response.isWishlisted;
+      return response.wishlisted;
     } catch {
       return false;
     }

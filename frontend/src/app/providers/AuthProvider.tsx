@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { authService, type CustomerInfo } from '../../services/auth/authService';
+import { authService, type CustomerInfo, type UpdateProfileRequest } from '../../services/auth/authService';
 import { useToast } from './ToastProvider';
 
 interface AuthContextValue {
@@ -7,8 +7,10 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
+  register: (email: string, password: string, firstName: string, lastName: string, mobile?: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (request: UpdateProfileRequest) => Promise<CustomerInfo>;
+  refreshCustomer: () => Promise<CustomerInfo>;
   clearError: () => void;
   error: string | null;
 }
@@ -25,23 +27,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        if (authService.isAuthenticated()) {
-          // Try to restore customer info from localStorage
-          const storedCustomer = localStorage.getItem('moodbuds_customer');
-          if (storedCustomer) {
-            try {
-              setCustomer(JSON.parse(storedCustomer));
-            } catch {
-              console.debug('Could not parse stored customer data');
-            }
-          }
-        }
+        setCustomer(await authService.restoreSession());
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeAuth();
+    const refreshed = (event: Event) => setCustomer((event as CustomEvent<CustomerInfo>).detail);
+    const expired = () => setCustomer(null);
+    window.addEventListener('moodbuds:auth-refreshed', refreshed);
+    window.addEventListener('moodbuds:auth-expired', expired);
+    return () => {
+      window.removeEventListener('moodbuds:auth-refreshed', refreshed);
+      window.removeEventListener('moodbuds:auth-expired', expired);
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -49,8 +49,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       setIsLoading(true);
       const response = await authService.login({ email, password });
-      console.log('Login response received:', response);
-      console.log('Setting customer:', response.customer);
       setCustomer(response.customer);
       toast.success('Login successful');
     } catch (err) {
@@ -63,11 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [toast]);
 
-  const register = useCallback(async (email: string, password: string, firstName?: string, lastName?: string) => {
+  const register = useCallback(async (email: string, password: string, firstName: string, lastName: string, mobile?: string) => {
     try {
       setError(null);
       setIsLoading(true);
-      const response = await authService.register({ email, password, firstName, lastName });
+      const response = await authService.register({ email, password, firstName, lastName, mobile: mobile || undefined });
       setCustomer(response.customer);
       toast.success('Registration successful');
     } catch (err) {
@@ -79,6 +77,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }, [toast]);
+
+  const refreshCustomer = useCallback(async () => {
+    const profile = await authService.profile();
+    setCustomer(profile);
+    return profile;
+  }, []);
+
+  const updateProfile = useCallback(async (request: UpdateProfileRequest) => {
+    const profile = await authService.updateProfile(request);
+    setCustomer(profile);
+    return profile;
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -105,10 +115,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
+      updateProfile,
+      refreshCustomer,
       clearError,
       error,
     }),
-    [customer, isLoading, login, register, logout, clearError, error]
+    [customer, isLoading, login, register, logout, updateProfile, refreshCustomer, clearError, error]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

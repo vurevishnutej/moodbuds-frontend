@@ -116,14 +116,10 @@ export const httpCartApi: CartApi = {
    * POST /customer/cart/coupon - Apply promo code
    */
   async applyPromoCode(code: string): Promise<Cart> {
-    try {
-      const response = await apiClient.post<CouponCartResponse>('/customer/cart/coupon', {
-        code,
-      });
-      return mapCartResponse(response.cart, response);
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiClient.post<CouponCartResponse>('/customer/cart/coupon', {
+      code,
+    });
+    return mapCartResponse(response.cart, response);
   },
 
   async removePromoCode(): Promise<Cart> {

@@ -6,6 +6,7 @@ import { moodBannerBackground } from '../../features/moods/utils/moodBanner';
 import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
 import { useQuizModal } from '../../app/providers/QuizProvider';
+import { useAuth } from '../../app/providers/AuthProvider';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const cartCount = cart.items.reduce((s, i) => s + i.qty, 0);
   const { moods } = useMoods();
   const bannerMood = moods.find((m) => m.id === 'party') ?? moods[0];
+  const { isAuthenticated, customer, logout } = useAuth();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -81,6 +83,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         <div className="mmb-drawer-divider" />
 
+        {isAuthenticated ? <>
+        <div className="mmb-drawer-link"><strong>{customer?.firstName} {customer?.lastName}</strong></div>
         <Link to="/profile" className="mmb-drawer-link" onClick={onClose}>
           My Profile <span className="chev">›</span>
         </Link>
@@ -93,6 +97,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <Link to="/profile/addresses" className="mmb-drawer-link" onClick={onClose}>
           Addresses <span className="chev">›</span>
         </Link>
+        <button type="button" className="mmb-drawer-link" onClick={() => { void logout(); onClose(); }}>Sign Out <span className="chev">›</span></button>
+        </> : <>
+          <Link to="/login" className="mmb-drawer-link" onClick={onClose}>Sign In <span className="chev">›</span></Link>
+          <Link to="/register" className="mmb-drawer-link" onClick={onClose}>Create Account <span className="chev">›</span></Link>
+        </>}
 
         <div className="mmb-drawer-divider" />
 
@@ -110,10 +119,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <span className="chev">›</span>
           </span>
         </button>
-        <Link to="/profile/admin" className="mmb-drawer-link" onClick={onClose}>
-          Admin Panel <span className="chev">›</span>
+        <Link to="/admin" className="mmb-drawer-link" onClick={onClose}>
+          Admin <span className="chev">›</span>
         </Link>
-        <Link to="/profile/contact" className="mmb-drawer-link" onClick={onClose}>
+        <Link to="/contact-us" className="mmb-drawer-link" onClick={onClose}>
           Contact Us <span className="chev">›</span>
         </Link>
       </div>

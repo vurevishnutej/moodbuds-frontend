@@ -13,7 +13,7 @@ export function EditProductsPage() {
         actions={
           <>
             <button className="adm-btn ghost sm" type="button">⬇ Export</button>
-            <button className="adm-btn primary" type="button" onClick={() => navigate('/profile/admin/create-product')}>
+            <button className="adm-btn primary" type="button" onClick={() => navigate('/admin/create-product')}>
               + Add product
             </button>
           </>

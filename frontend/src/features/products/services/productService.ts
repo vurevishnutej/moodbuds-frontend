@@ -2,7 +2,7 @@ import { mockProductApi } from './mockProductApi';
 import { httpProductApi } from './httpProductApi';
 import type { ProductApi } from './productApi';
 
-const useMock = import.meta.env.VITE_USE_MOCK_API !== 'false';
+const useMock = import.meta.env.VITE_USE_MOCK_API === 'true';
 
 /**
  * Swap point for real backend integration.

@@ -2,6 +2,7 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ToastProvider } from './providers/ToastProvider';
 import { AuthProvider } from './providers/AuthProvider';
+import { AdminAuthProvider } from './providers/AdminAuthProvider';
 import { CartProvider } from './providers/CartProvider';
 import { WishlistProvider } from './providers/WishlistProvider';
 import { QuizProvider } from './providers/QuizProvider';
@@ -22,7 +23,8 @@ export function App() {
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          <MoodProvider>
+          <AdminAuthProvider>
+           <MoodProvider>
             <CartProvider>
               <WishlistProvider>
                 <QuizProvider>
@@ -32,7 +34,8 @@ export function App() {
                 </QuizProvider>
               </WishlistProvider>
             </CartProvider>
-          </MoodProvider>
+           </MoodProvider>
+          </AdminAuthProvider>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>

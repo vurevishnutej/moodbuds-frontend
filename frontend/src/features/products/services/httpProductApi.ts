@@ -59,7 +59,7 @@ export const httpProductApi: ProductApi = {
     try {
       const product = await apiClient.get<ProductDetail>(`/products/${id}`);
       return product as unknown as Product;
-    } catch (error) {
+    } catch {
       return null;
     }
   },

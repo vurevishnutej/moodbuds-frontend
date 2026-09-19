@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
-import { formatINR } from '../../../utils/format';
 
 const TILES = [
   { to: '/profile/orders', name: 'Orders', desc: 'Track and manage your purchases' },
@@ -11,17 +10,11 @@ const TILES = [
   { to: '/profile/contact', name: 'Contact Us', desc: 'Get help from our support team' },
 ];
 
-// Demo membership data (can be replaced with real data from API)
-const DEMO_SPENT = 4297;
-const DEMO_TIER_AT = 5000;
-
 export function ProfileOverviewPage() {
   const { customer } = useAuth();
   const name = customer
     ? `${customer.firstName} ${customer.lastName}`
     : 'User';
-  const remaining = Math.max(0, DEMO_TIER_AT - DEMO_SPENT);
-  const pct = Math.min(100, (DEMO_SPENT / DEMO_TIER_AT) * 100);
 
   return (
     <div className="prof-panel active">
@@ -41,12 +34,7 @@ export function ProfileOverviewPage() {
           <div className="prof-mc-perk"><span className="prof-mc-perk-ico">↩</span> Free returns on every order</div>
           <div className="prof-mc-perk"><span className="prof-mc-perk-ico">◎</span> Win rewards for order streaks</div>
         </div>
-        <div className="prof-mc-progress-label">
-          <span>{formatINR(DEMO_SPENT)} spent</span>
-          <span>Shop {formatINR(remaining)} more to unlock Elite →</span>
-        </div>
-        <div className="prof-mc-bar"><div className="prof-mc-bar-fill" style={{ width: `${pct}%` }} /></div>
-        <div className="prof-mc-bar-ends"><span>₹0</span><span>{formatINR(DEMO_TIER_AT)}</span></div>
+        <div className="prof-mc-progress-label"><span>Your account details and purchases are synced with MoodBuds.</span></div>
       </div>
 
       <div className="prof-tiles">

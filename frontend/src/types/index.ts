@@ -102,40 +102,6 @@ export interface UpdateCartItemRequest {
   qty: number;
 }
 
-export type OrderStatus = 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-
-export interface OrderItem {
-  name: string;
-  image: string;
-}
-
-export interface Order {
-  id: string;
-  date: string;
-  status: OrderStatus;
-  moodLabel: string;
-  size: string;
-  color?: string;
-  total: number;
-  items: OrderItem[];
-}
-
-export interface Address {
-  id: string;
-  name: string;
-  line: string;
-  phone: string;
-  isDefault: boolean;
-}
-
-export interface Coupon {
-  code: string;
-  badge: string;
-  description: string;
-  validity: string;
-  variant: 'default' | 'pink' | 'gold';
-}
-
 export interface QuizOption {
   id: string;
   text: string;
@@ -157,15 +123,4 @@ export interface QuizResult {
 export interface CheckoutResult {
   success: boolean;
   orderId: string;
-}
-
-export interface UserProfile {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  dob: string;
-  gender: string;
-  totalSpent: number;
-  nextTierAt: number;
 }

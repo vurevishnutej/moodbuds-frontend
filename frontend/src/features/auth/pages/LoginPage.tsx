@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { useToast } from '../../../app/providers/ToastProvider';
 import '../styles/auth.css';
@@ -13,6 +13,7 @@ export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
+  const location = useLocation();
 
   // Form validation
   const validateForm = (): boolean => {
@@ -47,7 +48,8 @@ export function LoginPage() {
     try {
       await login(email, password);
       toast.success('Login successful!');
-      navigate('/');
+      const requested = (location.state as { from?: string } | null)?.from;
+      navigate(requested?.startsWith('/') ? requested : '/', { replace: true });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Login failed. Please try again.';
 

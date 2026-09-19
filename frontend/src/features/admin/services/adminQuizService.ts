@@ -67,7 +67,7 @@ export interface UpdateAdminQuestionRequest {
 
 export function adminAuthOptions() {
   const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
-  if (!token) throw new Error('SUPER_ADMIN login required');
+  if (!token) throw new Error('Administrator login required');
   return { includeAuth: false, headers: { Authorization: `Bearer ${token}` } };
 }
 
@@ -87,17 +87,28 @@ export const adminQuizService = {
       { username, password },
       { includeAuth: false },
     );
-    if (response.admin.role !== 'SUPER_ADMIN') {
-      throw new Error('This workspace is restricted to SUPER_ADMIN accounts.');
-    }
     sessionStorage.setItem(ADMIN_TOKEN_KEY, response.accessToken);
     sessionStorage.setItem(ADMIN_SUMMARY_KEY, JSON.stringify(response.admin));
+    window.dispatchEvent(new CustomEvent('moodbuds:admin-login', { detail: response.admin }));
     return response.admin;
+  },
+
+  async validate(): Promise<AdminSummary | null> {
+    if (!sessionStorage.getItem(ADMIN_TOKEN_KEY)) return null;
+    try {
+      const admin = await apiClient.get<AdminSummary>('/admin/auth/me', adminAuthOptions());
+      sessionStorage.setItem(ADMIN_SUMMARY_KEY, JSON.stringify(admin));
+      return admin;
+    } catch {
+      this.logout();
+      return null;
+    }
   },
 
   logout() {
     sessionStorage.removeItem(ADMIN_TOKEN_KEY);
     sessionStorage.removeItem(ADMIN_SUMMARY_KEY);
+    window.dispatchEvent(new Event('moodbuds:admin-logout'));
   },
 
   async getEditor(): Promise<AdminQuizEditor> {

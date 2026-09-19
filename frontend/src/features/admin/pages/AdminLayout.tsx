@@ -1,5 +1,6 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { ADMIN_SECTIONS, ADMIN_MODULE_LABELS } from '../../../data/admin';
+import { useAdminAuth } from '../../../app/providers/AdminAuthProvider';
 
 export function AdminHub() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export function AdminHub() {
                 key={slug}
                 type="button"
                 className="admin-card"
-                onClick={() => navigate(`/profile/admin/${slug}`)}
+                onClick={() => navigate(`/admin/${slug}`)}
               >
                 <span className="admin-card-tag">Module</span>
                 <span className="admin-card-title">{ADMIN_MODULE_LABELS[slug]}</span>
@@ -28,8 +29,18 @@ export function AdminHub() {
 }
 
 export function AdminLayout() {
+  const { admin, logout } = useAdminAuth();
+  const navigate = useNavigate();
   return (
     <div id="admin-stage">
+      <header className="admin-shell-header">
+        <Link to="/" className="admin-shell-logo">Mood<em>Buds</em></Link>
+        <Link to="/admin" className="admin-shell-home">Admin Dashboard</Link>
+        <div className="admin-shell-account">
+          <span>{admin?.fullName} · {admin?.role}</span>
+          <button type="button" onClick={() => { logout(); navigate('/admin/login'); }}>Sign out</button>
+        </div>
+      </header>
       <div id="panel-admin">
         <Outlet />
       </div>

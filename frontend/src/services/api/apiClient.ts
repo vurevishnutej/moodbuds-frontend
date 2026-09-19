@@ -4,9 +4,11 @@ const REFRESH_TOKEN_KEY = 'moodbuds_refresh_token';
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  body?: unknown;
+  constructor(status: number, message: string, body?: unknown) {
     super(message);
     this.status = status;
+    this.body = body;
   }
 }
 
@@ -36,11 +38,50 @@ export const tokenManager = {
   },
 
   isAuthenticated: (): boolean => {
-    return !!localStorage.getItem(TOKEN_KEY);
+    return !!localStorage.getItem(REFRESH_TOKEN_KEY);
   },
 };
 
-async function request<T>(path: string, init?: RequestInit, options?: ApiRequestOptions): Promise<T> {
+interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
+  customer: unknown;
+}
+
+let refreshInFlight: Promise<boolean> | null = null;
+
+function notifyAuth(type: 'refreshed' | 'expired', customer?: unknown) {
+  window.dispatchEvent(new CustomEvent(`moodbuds:auth-${type}`, { detail: customer }));
+}
+
+async function refreshCustomerSession(): Promise<boolean> {
+  if (refreshInFlight) return refreshInFlight;
+  const refreshToken = tokenManager.getRefreshToken();
+  if (!refreshToken) return false;
+  refreshInFlight = (async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/customer/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!res.ok) throw new Error('Session refresh failed');
+      const response = await res.json() as RefreshResponse;
+      tokenManager.setTokens(response.accessToken, response.refreshToken);
+      notifyAuth('refreshed', response.customer);
+      return true;
+    } catch {
+      tokenManager.clearTokens();
+      notifyAuth('expired');
+      return false;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
+}
+
+async function request<T>(path: string, init?: RequestInit, options?: ApiRequestOptions, retry = true): Promise<T> {
   const headers = new Headers(options?.headers);
   if (init?.body != null && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -60,13 +101,18 @@ async function request<T>(path: string, init?: RequestInit, options?: ApiRequest
   if (!res.ok) {
     const body = await res.text().catch(() => '');
 
-    // Handle 401 - token might be expired
-    if (res.status === 401 && token && options?.includeAuth !== false) {
-      tokenManager.clearTokens();
-      // Could trigger a refresh token flow here if needed
+    if (res.status === 401 && retry && options?.includeAuth !== false && !path.startsWith('/customer/auth/')) {
+      if (await refreshCustomerSession()) {
+        return request<T>(path, init, options, false);
+      }
     }
 
-    throw new ApiError(res.status, body || res.statusText);
+    let parsed: unknown;
+    try { parsed = body ? JSON.parse(body) : undefined; } catch { parsed = undefined; }
+    const detail = parsed && typeof parsed === 'object' && 'detail' in parsed
+      ? String((parsed as { detail?: unknown }).detail)
+      : body || res.statusText;
+    throw new ApiError(res.status, detail, parsed);
   }
 
   if (res.status === 204) return undefined as T;

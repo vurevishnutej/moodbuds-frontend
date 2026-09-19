@@ -56,7 +56,7 @@ export function OrderListPage() {
             {
               header: '',
               render: () => (
-                <button type="button" className="adm-ico-btn" title="View" onClick={() => navigate('/profile/admin/order-details')}>
+                <button type="button" className="adm-ico-btn" title="View" onClick={() => navigate('/admin/order-details')}>
                   👁
                 </button>
               ),

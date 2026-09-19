@@ -5,6 +5,7 @@ import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
 import { SearchIcon } from '../common/Icons';
 import { ProfileDropdown } from './ProfileDropdown';
+import { useAuth } from '../../app/providers/AuthProvider';
 
 export function ListingHeader({ activeMoodId }: { activeMoodId?: string }) {
   const [query, setQuery] = useState('');
@@ -13,6 +14,7 @@ export function ListingHeader({ activeMoodId }: { activeMoodId?: string }) {
   const { items: wishlistItems } = useWishlist();
   const cartCount = cart.items.reduce((s, i) => s + i.qty, 0);
   const { moods } = useMoods();
+  const { isAuthenticated } = useAuth();
 
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,22 +42,24 @@ export function ListingHeader({ activeMoodId }: { activeMoodId?: string }) {
                 onChange={(e) => setQuery(e.target.value)}
               />
             </form>
-            <div className="nav-profile-wrap">
-              <ProfileDropdown />
-            </div>
-            <Link className="header-icon" to="/wishlist" title="Wishlist" aria-label="Wishlist">
+            {isAuthenticated ? <div className="nav-profile-wrap"><ProfileDropdown /></div> : <>
+              <Link className="nav-action nav-auth-link" to="/login">Sign In</Link>
+              <Link className="nav-action nav-auth-link nav-auth-primary" to="/register">Sign Up</Link>
+            </>}
+            {isAuthenticated && <Link className="header-icon" to="/wishlist" title="Wishlist" aria-label="Wishlist">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path d="M12 20.5l-1.1-1C5.5 14.8 2 11.5 2 7.5 2 5 4 3 6.5 3c1.7 0 3.4 1 4.5 2.5C12.1 4 13.8 3 15.5 3 18 3 20 5 20 7.5c0 4-3.5 7.3-8.9 11.9L12 20.5z" />
               </svg>
               <span className="icon-badge">{wishlistItems.length || ''}</span>
-            </Link>
-            <Link className="header-icon" to="/cart" title="Bag" aria-label="Bag">
+            </Link>}
+            {isAuthenticated && <Link className="header-icon" to="/cart" title="Bag" aria-label="Bag">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path d="M6 7h12l-1 14H7L6 7z" />
                 <path d="M9 7V5a3 3 0 016 0v2" />
               </svg>
               <span className="icon-badge">{cartCount || ''}</span>
-            </Link>
+            </Link>}
+            <Link className="nav-action nav-admin-link" to="/admin">Admin</Link>
           </div>
         </div>
       </div>

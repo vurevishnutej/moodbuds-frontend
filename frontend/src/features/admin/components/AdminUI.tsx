@@ -53,7 +53,7 @@ export function AdminModuleBar({ title, sub, actions }: { title: string; sub: st
   const navigate = useNavigate();
   return (
     <div className="adm-modbar">
-      <button type="button" className="adm-back" onClick={() => navigate('/profile/admin')}>
+      <button type="button" className="adm-back" onClick={() => navigate('/admin')}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
         Admin
       </button>
