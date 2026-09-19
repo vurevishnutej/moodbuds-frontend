@@ -20,13 +20,12 @@ export function ProductDetailsPage() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const { product, related, loading, error } = useProduct(productId);
-  const { cart, addToCart } = useCart();
+  const { addToCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
 
   const [colorIdx, setColorIdx] = useState(0);
   const [size, setSize] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
-  const [adding, setAdding] = useState(false);
 
   if (loading) return <LoadingState label="Loading product…" />;
   if (error) return <ErrorState message={error} />;
@@ -41,15 +40,16 @@ export function ProductDetailsPage() {
 
   const wishlisted = isWishlisted(product.id);
   const selectedSize = size ?? product.sizes[Math.min(2, product.sizes.length - 1)];
-  const alreadyInBag = cart.items.some((item) => item.productId === product.id && item.size === selectedSize);
   const materialLabel = MOOD_MATERIAL[product.moodId as MoodId];
 
-  const handleAddToCart = async () => {
-    if (alreadyInBag) { navigate('/cart'); return; }
-    if (adding || !selectedSize) return;
-    setAdding(true);
-    try { await addToCart(product, selectedSize, product.colors[colorIdx]?.name ?? null, qty); }
-    finally { setAdding(false); }
+  const handleAddToCart = () => {
+    console.log('[ProductDetailsPage] Adding to cart:', {
+      product: product.name,
+      size: selectedSize,
+      color: product.colors[colorIdx]?.name,
+      qty,
+    });
+    addToCart(product, selectedSize, product.colors[colorIdx]?.name ?? null, qty);
   };
 
   return (
@@ -153,9 +153,7 @@ export function ProductDetailsPage() {
           </div>
 
           <div className="pd-cta">
-            <button type="button" className="pd-btn-cart" disabled={adding || !selectedSize} onClick={() => void handleAddToCart()}>
-              {adding ? 'Adding…' : alreadyInBag ? 'Go to bag' : 'Add to bag'}
-            </button>
+            <button type="button" className="pd-btn-cart" onClick={handleAddToCart}>Add to bag</button>
             <button type="button" className="pd-btn-wish" onClick={() => toggleWishlist(product)}>
               <span><HeartIcon size={14} filled={wishlisted} /></span> {wishlisted ? 'Saved' : 'Save to wishlist'}
             </button>

@@ -4,6 +4,7 @@ import { ProductListingPage } from '../features/products/pages/ProductListingPag
 import { ProductDetailsPage } from '../features/products/pages/ProductDetailsPage';
 import { SearchResultsPage } from '../features/products/pages/SearchResultsPage';
 import { CartPage } from '../features/cart/pages/CartPage';
+import { CheckoutPage } from '../features/checkout/pages/CheckoutPage';
 import { WishlistPage } from '../features/wishlist/pages/WishlistPage';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { RegisterPage } from '../features/auth/pages/RegisterPage';
@@ -13,13 +14,10 @@ import { ProfileInfoPage } from '../features/profile/pages/ProfileInfoPage';
 import { OrdersPage } from '../features/profile/pages/OrdersPage';
 import { AddressesPage } from '../features/profile/pages/AddressesPage';
 import { CouponsPage } from '../features/profile/pages/CouponsPage';
-import { ProfileWishlistPage } from '../features/profile/pages/ProfileWishlistPage';
-import { AboutUsPage } from '../features/content/pages/AboutUsPage';
-import { ContactUsPage } from '../features/content/pages/ContactUsPage';
+import { ContactPage } from '../features/profile/pages/ContactPage';
 import { AdminLayout, AdminHub } from '../features/admin/pages/AdminLayout';
-import { AdminLoginPage } from '../features/admin/pages/AdminLoginPage';
-import { AdminRoute, AdminGuestRoute, CustomerRoute, GuestRoute } from './RouteGuards';
 import { EditProductsPage } from '../features/admin/pages/EditProductsPage';
+import { EditProductPage } from '../features/admin/pages/EditProductPage';
 import { CreateProductPage } from '../features/admin/pages/CreateProductPage';
 import { OrderListPage } from '../features/admin/pages/OrderListPage';
 import { OrderDetailsPage } from '../features/admin/pages/OrderDetailsPage';
@@ -48,10 +46,8 @@ export function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
-      <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
-      <Route path="/about-us" element={<AboutUsPage />} />
-      <Route path="/contact-us" element={<ContactUsPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* Product Routes */}
       <Route path="/mood/:moodId" element={<ProductListingPage />} />
@@ -59,22 +55,22 @@ export function AppRoutes() {
       <Route path="/search" element={<SearchResultsPage />} />
 
       {/* User Routes (Protected) */}
-      <Route path="/cart" element={<CustomerRoute><CartPage /></CustomerRoute>} />
-      <Route path="/wishlist" element={<CustomerRoute><WishlistPage /></CustomerRoute>} />
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/wishlist" element={<WishlistPage />} />
 
-      <Route path="/profile" element={<CustomerRoute><ProfileLayout /></CustomerRoute>}>
+      <Route path="/profile" element={<ProfileLayout />}>
         <Route index element={<ProfileOverviewPage />} />
         <Route path="info" element={<ProfileInfoPage />} />
         <Route path="orders" element={<OrdersPage />} />
-        <Route path="wishlist" element={<ProfileWishlistPage />} />
         <Route path="addresses" element={<AddressesPage />} />
         <Route path="coupons" element={<CouponsPage />} />
-      </Route>
+        <Route path="contact" element={<ContactPage />} />
 
-      <Route path="/admin/login" element={<AdminGuestRoute><AdminLoginPage /></AdminGuestRoute>} />
-      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route path="admin" element={<AdminLayout />}>
           <Route index element={<AdminHub />} />
           <Route path="edit-products" element={<EditProductsPage />} />
+          <Route path="edit-products/:id" element={<EditProductPage />} />
           <Route path="create-product" element={<CreateProductPage />} />
           <Route path="bulk-import-export" element={<BulkImportExportPage />} />
           <Route path="categories" element={<CategoriesPage />} />
@@ -94,6 +90,7 @@ export function AppRoutes() {
           <Route path="coupons" element={<AdminCouponsPage />} />
           <Route path="admin-accounts" element={<AdminAccountsPage />} />
           <Route path="roles-permissions" element={<RolesPermissionsPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<HomePage />} />

@@ -3,11 +3,19 @@
  * These represent the shape of data the (future) backend API will return.
  */
 
-export type MoodId = string;
+export type MoodId =
+  | 'happy'
+  | 'confident'
+  | 'cool'
+  | 'professional'
+  | 'party'
+  | 'energetic'
+  | 'romantic'
+  | 'calm'
+  | 'minimal';
 
 export interface Mood {
   id: MoodId;
-  backendId?: number;
   emoji: string;
   title: string;
   subtitle: string;
@@ -16,8 +24,6 @@ export interface Mood {
   brand: string;
   offer: string;
   gradeOverlay: string;
-  displayOrder?: number;
-  productCount?: number;
 }
 
 export interface ProductTag {
@@ -27,6 +33,7 @@ export interface ProductTag {
 
 export interface Product {
   id: string;
+  slug?: string;
   name: string;
   brand: string;
   moodId: MoodId;
@@ -34,6 +41,7 @@ export interface Product {
   originalPrice?: number | null;
   badge?: 'Sale' | 'New' | null;
   image: string;
+  images?: string[];
   sizes: string[];
   colors: { name: string; hex: string }[];
   rating: number;
@@ -80,6 +88,15 @@ export interface WishlistItem {
   savedAt: number;
 }
 
+export interface Wishlist {
+  items: WishlistItem[];
+}
+
+export interface AddToWishlistRequest {
+  productId: string;
+  size?: string;
+}
+
 export interface Cart {
   items: CartItem[];
   subtotal: number;
@@ -100,6 +117,40 @@ export interface AddToCartRequest {
 export interface UpdateCartItemRequest {
   itemId: string;
   qty: number;
+}
+
+export type OrderStatus = 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+
+export interface OrderItem {
+  name: string;
+  image: string;
+}
+
+export interface Order {
+  id: string;
+  date: string;
+  status: OrderStatus;
+  moodLabel: string;
+  size: string;
+  color?: string;
+  total: number;
+  items: OrderItem[];
+}
+
+export interface Address {
+  id: string;
+  name: string;
+  line: string;
+  phone: string;
+  isDefault: boolean;
+}
+
+export interface Coupon {
+  code: string;
+  badge: string;
+  description: string;
+  validity: string;
+  variant: 'default' | 'pink' | 'gold';
 }
 
 export interface QuizOption {
@@ -123,4 +174,15 @@ export interface QuizResult {
 export interface CheckoutResult {
   success: boolean;
   orderId: string;
+}
+
+export interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  gender: string;
+  totalSpent: number;
+  nextTierAt: number;
 }

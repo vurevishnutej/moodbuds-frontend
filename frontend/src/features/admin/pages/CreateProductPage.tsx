@@ -1,112 +1,87 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AdminModuleBar, AdminBody, AdminDemoNote } from '../components/AdminUI';
-import { ADMIN_MOODS, adminThumb } from '../../../data/admin';
+import { ApiError } from '../../../services/api/apiClient';
+import { AdminModuleBar, AdminBody } from '../components/AdminUI';
+import { ProductForm, type ProductFormValue } from '../components/ProductForm';
+import { productAdminApi } from '../services/productAdminApi';
 import { useToast } from '../../../app/providers/ToastProvider';
-
-const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
 export function CreateProductPage() {
   const navigate = useNavigate();
   const toast = useToast();
-  const [moodIdx, setMoodIdx] = useState(0);
-  const [sizes, setSizes] = useState<boolean[]>(SIZES.map((_, i) => i > 0 && i < 4));
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (value: ProductFormValue, publish: boolean) => {
+    if (saving) return;
+
+    if (!value.name.trim()) return toast.error('Product name is required');
+    if (!value.sku.trim()) return toast.error('SKU is required');
+    if (!value.categoryId) return toast.error('Please select a category');
+    if (!value.subcategoryId) return toast.error('Please select a subcategory');
+    if (!value.gstRateId) return toast.error('Please select a GST rate');
+
+    const sellingPrice = Number(value.price);
+    if (!sellingPrice || sellingPrice <= 0) return toast.error('Enter a valid price');
+    const mrp = Number(value.mrp) || 0;
+    // Backend stores the regular price + an optional lower discount price.
+    const regularPrice = mrp > sellingPrice ? mrp : sellingPrice;
+    const discountPrice = mrp > sellingPrice ? sellingPrice : null;
+
+    if (publish) {
+      if (value.sizeStocks.length === 0) return toast.error('Add at least one size before publishing');
+      if (value.sizeStocks.some((s) => s.stockQuantity <= 0)) {
+        return toast.error('All selected sizes must have stock quantity > 0');
+      }
+      if (value.images.length < 3) return toast.error('Add at least 3 images before publishing');
+      if (value.moodIds.length === 0) return toast.error('Select at least one mood before publishing');
+    }
+
+    setSaving(true);
+    try {
+      const created = await productAdminApi.createProduct({
+        sku: value.sku.trim(),
+        name: value.name.trim(),
+        categoryId: Number(value.categoryId),
+        subcategoryId: Number(value.subcategoryId),
+        gstRateId: Number(value.gstRateId),
+        description: value.description,
+        colorName: value.colorName,
+        price: regularPrice,
+        discountPrice,
+        featured: value.featured,
+        newArrival: value.newArrival,
+        bestSeller: value.bestSeller,
+        returnWindowDays: Number(value.returnWindowDays) || 7,
+        sizes: value.sizeStocks.map((s) => ({ size: s.size, stockQuantity: s.stockQuantity })),
+        imageMediaIds: value.images.map((img) => img.mediaId),
+        moodIds: value.moodIds.map(Number),
+        publish,
+      });
+      
+      // Update sizes with full details (threshold, availability)
+      if (value.sizeStocks.length > 0) {
+        await productAdminApi.updateProductSizes(created.id, value.sizeStocks);
+      }
+      
+      toast.success(publish ? 'Product published ✦' : 'Product saved as draft');
+      navigate('/profile/admin/edit-products');
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Could not create the product';
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <>
-      <AdminModuleBar
-        title="Create Product"
-        sub="Add a new piece to the catalog"
-        actions={
-          <>
-            <button type="button" className="adm-btn ghost" onClick={() => navigate('/admin/edit-products')}>Cancel</button>
-            <button type="button" className="adm-btn rose" onClick={() => toast.info('Product saved as draft')}>Save draft</button>
-            <button type="button" className="adm-btn primary" onClick={() => toast.success('Product published ✦')}>Publish</button>
-          </>
-        }
-      />
+      <AdminModuleBar title="Create Product" sub="Add a new piece to the catalog" />
       <AdminBody>
-        <div className="adm-form-grid">
-          <div>
-            <div className="adm-card">
-              <div className="adm-card-head"><span className="adm-card-title">Product details</span></div>
-              <div className="adm-card-body">
-                <div className="adm-field"><label>Product name</label><input placeholder="e.g. Structured Blazer" /></div>
-                <div className="adm-field-row">
-                  <div className="adm-field"><label>Brand</label><input placeholder="The Boardroom" /></div>
-                  <div className="adm-field"><label>SKU</label><input placeholder="MB-BLZ-001" /></div>
-                </div>
-                <div className="adm-field"><label>Description</label><textarea placeholder="Describe the piece, fabric, fit…" /></div>
-                <div className="adm-field">
-                  <label>Mood</label>
-                  <div className="adm-chips">
-                    {ADMIN_MOODS.map((m, i) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        className={`adm-chip mood${i === moodIdx ? ' on' : ''}`}
-                        style={i === moodIdx ? { background: m.color, color: '#131722' } : undefined}
-                        onClick={() => setMoodIdx(i)}
-                      >
-                        {m.emoji} {m.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="adm-card">
-              <div className="adm-card-head"><span className="adm-card-title">Pricing & inventory</span></div>
-              <div className="adm-card-body">
-                <div className="adm-field-row">
-                  <div className="adm-field"><label>Price (₹)</label><input type="number" placeholder="3499" /></div>
-                  <div className="adm-field"><label>MRP (₹)</label><input type="number" placeholder="4299" /></div>
-                </div>
-                <div className="adm-field-row">
-                  <div className="adm-field"><label>Stock qty</label><input type="number" placeholder="24" /></div>
-                  <div className="adm-field">
-                    <label>Category</label>
-                    <select><option>Dresses</option><option>Outerwear</option><option>Tops</option><option>Footwear</option><option>Accessories</option></select>
-                  </div>
-                </div>
-                <div className="adm-field">
-                  <label>Available sizes</label>
-                  <div className="adm-chips">
-                    {SIZES.map((s, i) => (
-                      <button
-                        key={s}
-                        type="button"
-                        className={`adm-chip${sizes[i] ? ' on' : ''}`}
-                        onClick={() => setSizes((prev) => prev.map((v, idx) => (idx === i ? !v : v)))}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div className="adm-card">
-              <div className="adm-card-head"><span className="adm-card-title">Media</span></div>
-              <div className="adm-card-body">
-                <div className="adm-dropzone" onClick={() => toast.info('Image picker (demo)')}>
-                  <div className="big">⬆</div>Drag images here or <b>browse</b>
-                  <div style={{ fontSize: 11, marginTop: 6, color: '#bbb' }}>PNG / JPG up to 5MB</div>
-                </div>
-              </div>
-            </div>
-            <div className="adm-preview">
-              <div className="adm-preview-h">Live preview</div>
-              <div className="adm-pv-img"><img src={adminThumb(0)} alt="" /></div>
-              <div className="adm-pv-brand">The Boardroom</div>
-              <div className="adm-pv-name">Structured Blazer</div>
-              <div className="adm-pv-price">₹3,499 <span style={{ fontSize: 12, color: '#bbb', textDecoration: 'line-through', fontWeight: 400 }}>₹4,299</span></div>
-            </div>
-          </div>
-        </div>
-        <AdminDemoNote />
+        <ProductForm
+          mode="create"
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/profile/admin/edit-products')}
+        />
       </AdminBody>
     </>
   );

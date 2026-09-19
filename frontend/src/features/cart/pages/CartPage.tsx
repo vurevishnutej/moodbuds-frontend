@@ -1,40 +1,42 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SimpleNavbar } from '../../../components/layout/SimpleNavbar';
 import { BagIcon } from '../../../components/common/Icons';
 import { useCart } from '../../../app/providers/CartProvider';
 import { useWishlist } from '../../../app/providers/WishlistProvider';
-import { useToast } from '../../../app/providers/ToastProvider';
 import { CartItemRow } from '../components/CartItemRow';
 import { PriceSummary } from '../components/PriceSummary';
-import { checkoutService } from '../services/cartService';
 import { useBodyViewClass } from '../../../hooks/useBodyViewClass';
 import type { CartItem } from '../../../types';
 
 export function CartPage() {
   useBodyViewClass('cart');
-  const { cart, updateQty, removeItem, moveToWishlist, applyPromoCode, removePromoCode, refresh } = useCart();
-  const { refresh: refreshWishlist } = useWishlist();
-  const toast = useToast();
+  const { cart, updateQty, removeItem, applyPromoCode } = useCart();
+  const { toggleWishlist } = useWishlist();
   const navigate = useNavigate();
-  const [checkingOut, setCheckingOut] = useState(false);
 
   const count = cart.items.reduce((s, i) => s + i.qty, 0);
 
   const handleMoveToWishlist = async (item: CartItem) => {
-    await moveToWishlist(item.id);
-    await refreshWishlist();
+    await toggleWishlist({
+      id: item.productId,
+      name: item.name,
+      brand: item.brand,
+      moodId: item.moodId ?? 'happy',
+      price: item.price,
+      originalPrice: item.originalPrice,
+      badge: null,
+      image: item.image,
+      sizes: [item.size],
+      colors: [],
+      rating: 0,
+      reviewCount: 0,
+      description: '',
+    });
+    await removeItem(item.id);
   };
 
-  const handleCheckout = async () => {
-    setCheckingOut(true);
-    const result = await checkoutService.checkout(cart);
-    setCheckingOut(false);
-    if (result.success) {
-      toast.success(`Order placed — ${result.orderId}`);
-      await refresh();
-      navigate('/profile/orders');
-    }
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   return (
@@ -88,9 +90,8 @@ export function CartPage() {
             <PriceSummary
               cart={cart}
               onApplyPromo={applyPromoCode}
-              onRemovePromo={removePromoCode}
               onCheckout={handleCheckout}
-              checkingOut={checkingOut}
+              checkingOut={false}
             />
           )}
         </div>

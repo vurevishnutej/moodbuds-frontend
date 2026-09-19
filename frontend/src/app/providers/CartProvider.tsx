@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Cart, Product } from '../../types';
 import { cartService } from '../../features/cart/services/cartService';
 import { useToast } from './ToastProvider';
-import { useAuth } from './AuthProvider';
 
 const EMPTY_CART: Cart = { items: [], subtotal: 0, savings: 0, delivery: 0, discount: 0, total: 0, promoCode: null };
 
@@ -12,9 +11,7 @@ interface CartContextValue {
   addToCart: (product: Product, size: string, color?: string | null, qty?: number) => Promise<void>;
   updateQty: (itemId: string, qty: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
-  moveToWishlist: (itemId: string) => Promise<void>;
   applyPromoCode: (code: string) => Promise<boolean>;
-  removePromoCode: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -24,34 +21,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>(EMPTY_CART);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-  const { isAuthenticated, customer } = useAuth();
 
   const refresh = useCallback(async () => {
-    if (!isAuthenticated) { setCart(EMPTY_CART); return; }
     const next = await cartService.getCart();
     setCart(next);
-  }, [isAuthenticated]);
+  }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) { setCart(EMPTY_CART); setLoading(false); return; }
     setLoading(true);
-    cartService.getCart().then(setCart).catch(() => setCart(EMPTY_CART)).finally(() => setLoading(false));
-  }, [isAuthenticated, customer?.id]);
+    cartService
+      .getCart()
+      .then(setCart)
+      .finally(() => setLoading(false));
+  }, []);
 
   const addToCart = useCallback(
     async (product: Product, size: string, color?: string | null, qty = 1) => {
-      if (!isAuthenticated) { toast.info('Please sign in to add items to your bag'); return; }
       const next = await cartService.addToCart({ product, size, color, qty });
       setCart(next);
       toast.success('Added to bag');
     },
-    [isAuthenticated, toast]
+    [toast]
   );
 
   const updateQty = useCallback(async (itemId: string, qty: number) => {
-    const next = qty <= 0
-      ? await cartService.removeCartItem(itemId)
-      : await cartService.updateCartItem({ itemId, qty });
+    const next = await cartService.updateCartItem({ itemId, qty });
     setCart(next);
   }, []);
 
@@ -71,33 +65,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setCart(next);
         toast.success(`${code.toUpperCase()} applied`);
         return true;
-      } catch (error) {
-        let text='That code did not quite fit. Check it and try again.';
-        if (error instanceof Error && error.message) text = error.message;
-        toast.error(text);
+      } catch {
+        toast.error('Invalid promo code');
         return false;
       }
     },
     [toast]
   );
 
-  const moveToWishlist = useCallback(async (itemId: string) => {
-    try {
-      setCart(await cartService.moveToWishlist(itemId));
-      toast.success('Saved for later');
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : 'Could not save this item for later');
-      throw cause;
-    }
-  }, [toast]);
-
-  const removePromoCode = useCallback(async () => {
-    const next=await cartService.removePromoCode(); setCart(next); toast.info('Coupon removed');
-  },[toast]);
-
   const value = useMemo(
-    () => ({ cart, loading, addToCart, updateQty, removeItem, moveToWishlist, applyPromoCode, removePromoCode, refresh }),
-    [cart, loading, addToCart, updateQty, removeItem, moveToWishlist, applyPromoCode, removePromoCode, refresh]
+    () => ({ cart, loading, addToCart, updateQty, removeItem, applyPromoCode, refresh }),
+    [cart, loading, addToCart, updateQty, removeItem, applyPromoCode, refresh]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

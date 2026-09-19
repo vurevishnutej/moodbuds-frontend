@@ -9,14 +9,53 @@ export interface AdminMood {
 }
 
 export interface AdminProduct {
+  id?: number;
   sku: string;
   name: string;
   brand: string;
   mood: string;
   price: number;
   stock: number;
-  status: 'Active' | 'Out of stock' | 'Low stock';
+  status: 'Active' | 'Out of stock' | 'Low stock' | 'Draft';
   image: string;
+  mrp?: number;
+  description?: string;
+  category?: string;
+  subcategory?: string;
+  sizes?: string[];
+  sizeStocks?: Array<{ size: string; stockQuantity: number; lowStockThreshold: number; available: boolean }>;
+  images?: string[];
+  // Additional fields for full product editing
+  categoryId?: number | string;
+  subcategoryId?: number | string;
+  gstRateId?: number | string;
+  colorName?: string;
+  moodIds?: (number | string)[];
+  returnWindowDays?: number;
+  featured?: boolean;
+  newArrival?: boolean;
+  bestSeller?: boolean;
+}
+
+export interface AdminCategory {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  products: number;
+  subcategoryCount: number;
+  status: 'Active' | 'Draft';
+}
+
+export interface AdminSubcategory {
+  id: string;
+  parentId: string;
+  parent: string;
+  name: string;
+  slug: string;
+  image: string;
+  products: number;
+  status: 'Active' | 'Draft';
 }
 
 export interface AdminOrder {
@@ -53,16 +92,16 @@ export function adminThumb(i: number): string {
 }
 
 export const ADMIN_PRODUCTS: AdminProduct[] = [
-  { sku: 'MB-BLZ-001', name: 'Structured Blazer', brand: 'The Boardroom', mood: 'professional', price: 3499, stock: 24, status: 'Active', image: THUMB_IMAGES[0] },
-  { sku: 'MB-DRS-014', name: 'Satin Slip Dress', brand: 'Blush House', mood: 'romantic', price: 2499, stock: 8, status: 'Active', image: THUMB_IMAGES[1] },
-  { sku: 'MB-SHT-022', name: 'Oversized Linen Shirt', brand: 'Still Water', mood: 'calm', price: 1499, stock: 0, status: 'Out of stock', image: THUMB_IMAGES[2] },
-  { sku: 'MB-TRN-007', name: 'Clean Line Trench', brand: 'Form Zero', mood: 'minimal', price: 4299, stock: 15, status: 'Active', image: THUMB_IMAGES[3] },
-  { sku: 'MB-SEQ-031', name: 'Sequin Mini Dress', brand: 'After Dark', mood: 'party', price: 2999, stock: 31, status: 'Active', image: THUMB_IMAGES[4] },
-  { sku: 'MB-SHO-045', name: 'Cushioned Running Shoes', brand: 'Stride Co.', mood: 'energetic', price: 2999, stock: 5, status: 'Low stock', image: THUMB_IMAGES[5] },
-  { sku: 'MB-COT-009', name: 'Power Shoulder Coat', brand: 'Power Dressing', mood: 'confident', price: 5299, stock: 12, status: 'Active', image: THUMB_IMAGES[6] },
-  { sku: 'MB-TEE-052', name: 'Sunshine Knit Tee', brand: 'Sunshine Edit', mood: 'happy', price: 999, stock: 64, status: 'Active', image: THUMB_IMAGES[7] },
-  { sku: 'MB-JKT-018', name: 'Faded Denim Jacket', brand: 'Ice Edit', mood: 'cool', price: 2799, stock: 19, status: 'Active', image: THUMB_IMAGES[0] },
-  { sku: 'MB-EAR-061', name: 'Pearl Detail Earrings', brand: 'Tender Things', mood: 'romantic', price: 799, stock: 2, status: 'Low stock', image: THUMB_IMAGES[1] },
+  { sku: 'MB-BLZ-001', name: 'Structured Blazer', brand: 'The Boardroom', mood: 'professional', price: 3499, mrp: 4299, stock: 24, status: 'Active', image: THUMB_IMAGES[0], images: [THUMB_IMAGES[0], THUMB_IMAGES[6]], category: 'Outerwear', subcategory: 'Blazers', sizes: ['S', 'M', 'L'], description: 'A tailored blazer with sharp shoulders and a clean silhouette, built for boardroom days.' },
+  { sku: 'MB-DRS-014', name: 'Satin Slip Dress', brand: 'Blush House', mood: 'romantic', price: 2499, mrp: 2999, stock: 8, status: 'Active', image: THUMB_IMAGES[1], images: [THUMB_IMAGES[1]], category: 'Dresses', subcategory: 'Slip Dresses', sizes: ['XS', 'S', 'M'], description: 'Bias-cut satin slip dress that skims the body in soft, fluid folds.' },
+  { sku: 'MB-SHT-022', name: 'Oversized Linen Shirt', brand: 'Still Water', mood: 'calm', price: 1499, mrp: 1799, stock: 0, status: 'Out of stock', image: THUMB_IMAGES[2], images: [THUMB_IMAGES[2]], category: 'Tops', subcategory: '', sizes: ['M', 'L', 'XL'], description: 'Breathable oversized linen shirt in a relaxed, easy fit.' },
+  { sku: 'MB-TRN-007', name: 'Clean Line Trench', brand: 'Form Zero', mood: 'minimal', price: 4299, mrp: 5299, stock: 15, status: 'Active', image: THUMB_IMAGES[3], images: [THUMB_IMAGES[3]], category: 'Outerwear', subcategory: 'Trench Coats', sizes: ['S', 'M', 'L'], description: 'Minimalist trench with clean lines and a belted waist.' },
+  { sku: 'MB-SEQ-031', name: 'Sequin Mini Dress', brand: 'After Dark', mood: 'party', price: 2999, mrp: 3699, stock: 31, status: 'Active', image: THUMB_IMAGES[4], images: [THUMB_IMAGES[4]], category: 'Dresses', subcategory: 'Mini Dresses', sizes: ['XS', 'S', 'M', 'L'], description: 'All-over sequin mini dress made for the dance floor.' },
+  { sku: 'MB-SHO-045', name: 'Cushioned Running Shoes', brand: 'Stride Co.', mood: 'energetic', price: 2999, mrp: 3499, stock: 5, status: 'Low stock', image: THUMB_IMAGES[5], images: [THUMB_IMAGES[5]], category: 'Footwear', subcategory: 'Sneakers', sizes: ['6', '7', '8', '9', '10'], description: 'Lightweight cushioned sneakers built for everyday miles.' },
+  { sku: 'MB-COT-009', name: 'Power Shoulder Coat', brand: 'Power Dressing', mood: 'confident', price: 5299, mrp: 6299, stock: 12, status: 'Active', image: THUMB_IMAGES[6], images: [THUMB_IMAGES[6]], category: 'Outerwear', subcategory: 'Blazers', sizes: ['S', 'M', 'L', 'XL'], description: 'Structured coat with strong shoulders that commands the room.' },
+  { sku: 'MB-TEE-052', name: 'Sunshine Knit Tee', brand: 'Sunshine Edit', mood: 'happy', price: 999, mrp: 1299, stock: 64, status: 'Active', image: THUMB_IMAGES[7], images: [THUMB_IMAGES[7]], category: 'Tops', subcategory: '', sizes: ['XS', 'S', 'M', 'L', 'XL'], description: 'Soft knit tee in a warm sunshine hue.' },
+  { sku: 'MB-JKT-018', name: 'Faded Denim Jacket', brand: 'Ice Edit', mood: 'cool', price: 2799, mrp: 3299, stock: 19, status: 'Active', image: THUMB_IMAGES[0], images: [THUMB_IMAGES[0]], category: 'Outerwear', subcategory: '', sizes: ['S', 'M', 'L'], description: 'Faded wash denim jacket with a relaxed, worn-in feel.' },
+  { sku: 'MB-EAR-061', name: 'Pearl Detail Earrings', brand: 'Tender Things', mood: 'romantic', price: 799, mrp: 999, stock: 2, status: 'Low stock', image: THUMB_IMAGES[1], images: [THUMB_IMAGES[1]], category: 'Accessories', subcategory: 'Earrings', sizes: [], description: 'Delicate pearl-detail drop earrings for soft evenings.' },
 ];
 
 export const ADMIN_ORDERS: AdminOrder[] = [
@@ -75,24 +114,41 @@ export const ADMIN_ORDERS: AdminOrder[] = [
   { id: 'MBD-100476', customer: 'Kishore', date: '25 Jun 2026', items: 1, total: 5299, payment: 'Paid', status: 'Shipped', mood: 'confident' },
 ];
 
-export const ADMIN_CATEGORIES = [
-  { name: 'Dresses', products: 64, status: 'Active' },
-  { name: 'Outerwear', products: 48, status: 'Active' },
-  { name: 'Tops', products: 72, status: 'Active' },
-  { name: 'Bottoms', products: 39, status: 'Active' },
-  { name: 'Footwear', products: 41, status: 'Active' },
-  { name: 'Accessories', products: 48, status: 'Active' },
-  { name: 'Loungewear', products: 22, status: 'Draft' },
+export function slugify(s: string): string {
+  return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+const CAT_IMAGES: Record<string, string> = {
+  dresses: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&h=300&q=70',
+  outerwear: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=300&h=300&q=70',
+  tops: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&h=300&q=70',
+  bottoms: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=300&h=300&q=70',
+  footwear: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=300&h=300&q=70',
+  accessories: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=300&h=300&q=70',
+  loungewear: 'https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=300&h=300&q=70',
+  men: 'https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=300&h=300&q=70',
+  women: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=300&h=300&q=70',
+  kids: 'https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?auto=format&fit=crop&w=300&h=300&q=70',
+};
+
+export const ADMIN_CATEGORIES: AdminCategory[] = [
+  { id: 'cat-dresses', name: 'Dresses', slug: 'dresses', image: CAT_IMAGES.dresses, products: 64, subcategoryCount: 3, status: 'Active' },
+  { id: 'cat-outerwear', name: 'Outerwear', slug: 'outerwear', image: CAT_IMAGES.outerwear, products: 48, subcategoryCount: 2, status: 'Active' },
+  { id: 'cat-tops', name: 'Tops', slug: 'tops', image: CAT_IMAGES.tops, products: 72, subcategoryCount: 0, status: 'Active' },
+  { id: 'cat-bottoms', name: 'Bottoms', slug: 'bottoms', image: CAT_IMAGES.bottoms, products: 39, subcategoryCount: 0, status: 'Active' },
+  { id: 'cat-footwear', name: 'Footwear', slug: 'footwear', image: CAT_IMAGES.footwear, products: 41, subcategoryCount: 1, status: 'Active' },
+  { id: 'cat-accessories', name: 'Accessories', slug: 'accessories', image: CAT_IMAGES.accessories, products: 48, subcategoryCount: 1, status: 'Active' },
+  { id: 'cat-loungewear', name: 'Loungewear', slug: 'loungewear', image: CAT_IMAGES.loungewear, products: 22, subcategoryCount: 0, status: 'Draft' },
 ];
 
-export const ADMIN_SUBCATEGORIES = [
-  { parent: 'Dresses', name: 'Slip Dresses', products: 18 },
-  { parent: 'Dresses', name: 'Mini Dresses', products: 22 },
-  { parent: 'Dresses', name: 'Midi Dresses', products: 24 },
-  { parent: 'Outerwear', name: 'Blazers', products: 16 },
-  { parent: 'Outerwear', name: 'Trench Coats', products: 12 },
-  { parent: 'Footwear', name: 'Sneakers', products: 20 },
-  { parent: 'Accessories', name: 'Earrings', products: 14 },
+export const ADMIN_SUBCATEGORIES: AdminSubcategory[] = [
+  { id: 'sub-slip-dresses', parentId: 'cat-dresses', parent: 'Dresses', name: 'Slip Dresses', slug: 'slip-dresses', image: CAT_IMAGES.dresses, products: 18, status: 'Active' },
+  { id: 'sub-mini-dresses', parentId: 'cat-dresses', parent: 'Dresses', name: 'Mini Dresses', slug: 'mini-dresses', image: CAT_IMAGES.dresses, products: 22, status: 'Active' },
+  { id: 'sub-midi-dresses', parentId: 'cat-dresses', parent: 'Dresses', name: 'Midi Dresses', slug: 'midi-dresses', image: CAT_IMAGES.dresses, products: 24, status: 'Active' },
+  { id: 'sub-blazers', parentId: 'cat-outerwear', parent: 'Outerwear', name: 'Blazers', slug: 'blazers', image: CAT_IMAGES.outerwear, products: 16, status: 'Active' },
+  { id: 'sub-trench-coats', parentId: 'cat-outerwear', parent: 'Outerwear', name: 'Trench Coats', slug: 'trench-coats', image: CAT_IMAGES.outerwear, products: 12, status: 'Active' },
+  { id: 'sub-sneakers', parentId: 'cat-footwear', parent: 'Footwear', name: 'Sneakers', slug: 'sneakers', image: CAT_IMAGES.footwear, products: 20, status: 'Active' },
+  { id: 'sub-earrings', parentId: 'cat-accessories', parent: 'Accessories', name: 'Earrings', slug: 'earrings', image: CAT_IMAGES.accessories, products: 14, status: 'Draft' },
 ];
 
 export const ADMIN_COUPONS = [

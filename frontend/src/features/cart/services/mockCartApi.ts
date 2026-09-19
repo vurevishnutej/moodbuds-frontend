@@ -1,4 +1,4 @@
-import type { Cart, CartItem, WishlistItem, AddToCartRequest, UpdateCartItemRequest, CheckoutResult } from '../../../types';
+import type { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest, CheckoutResult } from '../../../types';
 import { CART_SEED } from '../../../data/cartSeed';
 import { storage, STORAGE_KEYS } from '../../../services/storage/storageService';
 import { delay, uniqueId } from '../../../utils/format';
@@ -52,7 +52,9 @@ export const mockCartApi: CartApi = {
     await delay(200);
     const items = readItems();
     const existing = items.find((i) => i.productId === product.id && i.size === size && i.color === (color ?? null));
-    if (!existing) {
+    if (existing) {
+      existing.qty += qty;
+    } else {
       items.push({
         id: uniqueId('cart'),
         productId: product.id,
@@ -96,30 +98,6 @@ export const mockCartApi: CartApi = {
       throw new Error('Invalid promo code');
     }
     writePromo(normalized);
-    return computeCart();
-  },
-
-  async moveToWishlist(itemId: string) {
-    await delay(150);
-    const items = readItems();
-    const item = items.find((candidate) => candidate.id === itemId);
-    if (!item) return computeCart();
-    const wishlist = storage.get<WishlistItem[]>(STORAGE_KEYS.wishlist, []);
-    if (!wishlist.some((saved) => saved.productId === item.productId && saved.sizes.includes(item.size))) {
-      wishlist.push({
-        id: uniqueId('wl'), productId: item.productId, moodId: item.moodId, name: item.name,
-        brand: item.brand, price: item.price, originalPrice: item.originalPrice,
-        sizes: [item.size], image: item.image, savedAt: Date.now(),
-      });
-      storage.set(STORAGE_KEYS.wishlist, wishlist);
-    }
-    writeItems(items.filter((candidate) => candidate.id !== itemId));
-    return computeCart();
-  },
-
-  async removePromoCode() {
-    writePromo(null);
-    await delay();
     return computeCart();
   },
 

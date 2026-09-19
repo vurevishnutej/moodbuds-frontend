@@ -1,6 +1,8 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { ADMIN_SECTIONS, ADMIN_MODULE_LABELS } from '../../../data/admin';
-import { useAdminAuth } from '../../../app/providers/AdminAuthProvider';
+import { AdminLoginGate } from '../components/AdminLoginGate';
+import { adminAuthService } from '../services/adminAuthService';
 
 export function AdminHub() {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ export function AdminHub() {
                 key={slug}
                 type="button"
                 className="admin-card"
-                onClick={() => navigate(`/admin/${slug}`)}
+                onClick={() => navigate(`/profile/admin/${slug}`)}
               >
                 <span className="admin-card-tag">Module</span>
                 <span className="admin-card-title">{ADMIN_MODULE_LABELS[slug]}</span>
@@ -29,21 +31,15 @@ export function AdminHub() {
 }
 
 export function AdminLayout() {
-  const { admin, logout } = useAdminAuth();
-  const navigate = useNavigate();
+  const [authed, setAuthed] = useState(adminAuthService.isAuthenticated());
+
+  if (!authed) {
+    return <AdminLoginGate onSignedIn={() => setAuthed(true)} />;
+  }
+
   return (
-    <div id="admin-stage">
-      <header className="admin-shell-header">
-        <Link to="/" className="admin-shell-logo">Mood<em>Buds</em></Link>
-        <Link to="/admin" className="admin-shell-home">Admin Dashboard</Link>
-        <div className="admin-shell-account">
-          <span>{admin?.fullName} · {admin?.role}</span>
-          <button type="button" onClick={() => { logout(); navigate('/admin/login'); }}>Sign out</button>
-        </div>
-      </header>
-      <div id="panel-admin">
-        <Outlet />
-      </div>
+    <div id="panel-admin">
+      <Outlet />
     </div>
   );
 }

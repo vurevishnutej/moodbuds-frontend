@@ -11,8 +11,8 @@ type SortMode = 'recent' | 'price-asc' | 'price-desc' | 'name';
 
 export function WishlistPage() {
   useBodyViewClass('wishlist');
-  const { items, removeItem, moveToCart } = useWishlist();
-  const { refresh: refreshCart } = useCart();
+  const { items, removeItem } = useWishlist();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const [sort, setSort] = useState<SortMode>('recent');
 
@@ -26,8 +26,25 @@ export function WishlistPage() {
   }, [items, sort]);
 
   const handleMoveToBag = async (item: WishlistItem, size: string) => {
-    await moveToCart(item.id, size || item.sizes[0] || '');
-    await refreshCart();
+    await addToCart(
+      {
+        id: item.productId,
+        name: item.name,
+        brand: item.brand,
+        moodId: item.moodId ?? 'happy',
+        price: item.price,
+        originalPrice: item.originalPrice,
+        badge: item.badge ?? null,
+        image: item.image,
+        sizes: item.sizes,
+        colors: [],
+        rating: 0,
+        reviewCount: 0,
+        description: '',
+      },
+      size || item.sizes[0] || ''
+    );
+    await removeItem(item.id);
   };
 
   return (

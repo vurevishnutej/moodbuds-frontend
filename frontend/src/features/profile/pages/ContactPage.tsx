@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useToast } from '../../../app/providers/ToastProvider';
-import { siteContentService, type ContactContent } from '../../content/services/siteContentService';
 
-const SUPPORT_CARDS = [
+const CONTACT_CARDS = [
+  { ico: '✉', label: 'Email', value: 'hello@moodbuds.com', desc: 'Reply within 24 hours' },
+  { ico: '☏', label: 'Phone', value: '1800-MOOD-BUD', desc: 'Mon–Sat, 9am–8pm IST' },
   { ico: '⊞', label: 'Live Chat', value: 'Chat now', desc: 'Available 9am–11pm daily' },
   { ico: '◎', label: 'Track Order', value: 'Order status', desc: 'Real-time tracking' },
 ];
@@ -10,16 +11,7 @@ const SUPPORT_CARDS = [
 export function ContactPage() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [contact, setContact] = useState<ContactContent | null>(null);
   const toast = useToast();
-
-  useEffect(() => { void siteContentService.contact().then(setContact).catch(() => undefined); }, []);
-
-  const contactCards = [
-    { ico: '✉', label: 'Email', value: contact?.supportEmail || 'Loading…', desc: 'Send us a note anytime' },
-    { ico: '☏', label: 'Phone', value: contact?.supportPhone || 'Loading…', desc: contact?.supportHours || 'Checking support hours…' },
-    ...SUPPORT_CARDS,
-  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +28,7 @@ export function ContactPage() {
       </div>
       <div className="prof-box">
         <div className="contact-grid">
-          {contactCards.map((c) => (
+          {CONTACT_CARDS.map((c) => (
             <div className="contact-card" key={c.label}>
               <div className="contact-ico">{c.ico}</div>
               <div className="contact-label">{c.label}</div>

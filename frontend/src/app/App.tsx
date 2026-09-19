@@ -2,11 +2,9 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ToastProvider } from './providers/ToastProvider';
 import { AuthProvider } from './providers/AuthProvider';
-import { AdminAuthProvider } from './providers/AdminAuthProvider';
 import { CartProvider } from './providers/CartProvider';
 import { WishlistProvider } from './providers/WishlistProvider';
 import { QuizProvider } from './providers/QuizProvider';
-import { MoodProvider } from './providers/MoodProvider';
 import { AppRoutes } from './routes';
 import { QuizModal } from '../features/quiz/components/QuizModal';
 
@@ -23,19 +21,15 @@ export function App() {
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          <AdminAuthProvider>
-           <MoodProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <QuizProvider>
-                  <ScrollToTop />
-                  <AppRoutes />
-                  <QuizModal />
-                </QuizProvider>
-              </WishlistProvider>
-            </CartProvider>
-           </MoodProvider>
-          </AdminAuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <QuizProvider>
+                <ScrollToTop />
+                <AppRoutes />
+                <QuizModal />
+              </QuizProvider>
+            </WishlistProvider>
+          </CartProvider>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>

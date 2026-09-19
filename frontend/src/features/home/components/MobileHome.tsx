@@ -1,13 +1,10 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useMoods } from '../../moods/hooks/useMoods';
+import { MOODS } from '../../../data/moods';
 import { PRODUCTS } from '../../../data/products';
 import { capitalize } from '../../../utils/format';
 import { useQuizModal } from '../../../app/providers/QuizProvider';
 import { MobileProductCarousel } from './MobileProductCarousel';
-import { moodBannerBackground } from '../../moods/utils/moodBanner';
-import { useHomepageCoupon } from '../../coupons/hooks/useHomepageCoupon';
-import { couponOffer } from '../../coupons/services/couponService';
 
 const QUIZ_FIELD_EMOJIS = ['💫', '✨', '🌙', '💖', '⚡', '🌈', '🌹', '🦋', '👑', '🎵', '☁️', '🌟', '💝', '🎀', '🔥', '😊'];
 
@@ -32,9 +29,7 @@ const QUIZ_FIELD_POS = [
 
 export function MobileHome() {
   const quiz = useQuizModal();
-  const { moods } = useMoods();
-  const homepageCoupon = useHomepageCoupon();
-  const heroMoods = moods.slice(0, 5);
+  const heroMoods = MOODS.slice(0, 5);
 
   const newArrivals = useMemo(
     () => PRODUCTS.filter((p) => p.badge === 'New').slice(0, 10),
@@ -49,7 +44,7 @@ export function MobileHome() {
     <div className="mmb-home">
       <div className="mmb-home-content">
         <div className="mmb-cat-strip">
-          {moods.map((m) => (
+          {MOODS.map((m) => (
             <Link
               key={m.id}
               to={`/mood/${m.id}`}
@@ -57,21 +52,21 @@ export function MobileHome() {
               style={{ ['--mmb-accent' as string]: m.accentColor }}
             >
               <div className="mmb-cat-item-ring">
-                <div className="mmb-cat-item-img" style={{ backgroundImage: moodBannerBackground(m) }} />
+                <div className="mmb-cat-item-img" style={{ backgroundImage: `url(${m.image.replace('w=1400', 'w=200')})` }} />
               </div>
               <span className="mmb-cat-item-lbl">{m.title}</span>
             </Link>
           ))}
         </div>
 
-        {homepageCoupon && <div className="mmb-coupon-banner">
+        <div className="mmb-coupon-banner">
           <span className="mmb-coupon-percent">%</span>
           <div className="mmb-coupon-main">
-            <div className="mmb-coupon-headline"><em>{couponOffer(homepageCoupon)}</em> on your first order</div>
-            <div className="mmb-coupon-sub">{homepageCoupon.minOrderValue ? `Min. order value ₹${Math.round(homepageCoupon.minOrderValue / 100).toLocaleString('en-IN')}` : 'A little welcome sparkle, just for you'} · T&amp;C apply</div>
+            <div className="mmb-coupon-headline">Flat <em>₹300 Off</em> on your first order</div>
+            <div className="mmb-coupon-sub">Min. order value ₹1,499 · T&amp;C apply</div>
           </div>
-          <span className="mmb-coupon-code">{homepageCoupon.code}</span>
-        </div>}
+          <span className="mmb-coupon-code">MOOD300</span>
+        </div>
 
         <div className="mmb-hero-scroll">
           {heroMoods.map((m) => (
@@ -79,7 +74,7 @@ export function MobileHome() {
               key={m.id}
               to={`/mood/${m.id}`}
               className="mmb-hero-card"
-              style={{ backgroundImage: moodBannerBackground(m) }}
+              style={{ backgroundImage: `url(${m.image.replace('w=1400', 'w=800')})` }}
             >
               <span className="mmb-hero-eyebrow">{m.offer}</span>
               <span className="mmb-hero-title">{capitalize(m.title)}<br />{m.subtitle}</span>

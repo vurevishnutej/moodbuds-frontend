@@ -46,33 +46,6 @@ export function UserIcon({ size = 18, className }: IconProps) {
   );
 }
 
-export function PackageIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>
-      <path d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5v-9z" />
-      <path d="M4.5 7.5L12 12l7.5-4.5M12 12v9M8 5.2l8 4.6" />
-    </svg>
-  );
-}
-
-export function TicketIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>
-      <path d="M3 7h18v3a2 2 0 000 4v3H3v-3a2 2 0 000-4V7z" />
-      <path d="M13 9l-2 6M9.5 9.5h.01M14.5 14.5h.01" />
-    </svg>
-  );
-}
-
-export function LocationIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>
-      <path d="M12 21s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z" />
-      <circle cx="12" cy="9" r="2.5" />
-    </svg>
-  );
-}
-
 export function ArrowLeftIcon({ size = 13, className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>

@@ -4,11 +4,16 @@ import { useAuth } from '../../../app/providers/AuthProvider';
 
 const NAV_ITEMS: { to: string; label: string; end?: boolean }[] = [
   { to: '/profile', label: 'Overview', end: true },
-  { to: '/profile/orders', label: 'Orders' },
-  { to: '/profile/wishlist', label: 'Wishlist' },
-  { to: '/profile/addresses', label: 'Addresses' },
-  { to: '/profile/coupons', label: 'Coupons' },
   { to: '/profile/info', label: 'Profile' },
+];
+const NAV_ITEMS_2: { to: string; label: string }[] = [
+  { to: '/profile/orders', label: 'Orders' },
+  { to: '/wishlist', label: 'Wishlist' },
+  { to: '/profile/addresses', label: 'Addresses' },
+];
+const NAV_ITEMS_3: { to: string; label: string }[] = [
+  { to: '/profile/coupons', label: 'Coupons' },
+  { to: '/profile/contact', label: 'Contact Us' },
 ];
 
 export function ProfileSidebar() {
@@ -25,7 +30,7 @@ export function ProfileSidebar() {
     try {
       await logout();
       navigate('/');
-    } catch {
+    } catch (error) {
       toast.error('Failed to sign out');
     }
   };
@@ -44,6 +49,26 @@ export function ProfileSidebar() {
             <span className="prof-nav-arrow">›</span>
           </NavLink>
         ))}
+        <div className="prof-nav-divider" />
+        {NAV_ITEMS_2.map((item) => (
+          <NavLink key={item.to} to={item.to} className={itemClass}>
+            <span>{item.label}</span>
+            <span className="prof-nav-arrow">›</span>
+          </NavLink>
+        ))}
+        <div className="prof-nav-divider" />
+        {NAV_ITEMS_3.map((item) => (
+          <NavLink key={item.to} to={item.to} className={itemClass}>
+            <span>{item.label}</span>
+            <span className="prof-nav-arrow">›</span>
+          </NavLink>
+        ))}
+        <div className="prof-nav-divider" />
+        <NavLink to="/profile/admin" className={({ isActive }) => `prof-nav-item prof-nav-admin${isActive ? ' active' : ''}`}>
+          <span>Admin Panel</span>
+          <span className="prof-admin-tag">Admin</span>
+          <span className="prof-nav-arrow">›</span>
+        </NavLink>
         <div className="prof-nav-divider" />
         <button type="button" className="prof-nav-item prof-nav-logout" onClick={handleLogout}>
           <span>Sign Out</span>

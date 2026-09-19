@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { USER_PROFILE } from '../../data/profile';
 import { useToast } from '../../app/providers/ToastProvider';
 import { useAuth } from '../../app/providers/AuthProvider';
 
@@ -14,9 +15,12 @@ export function ProfileDropdown() {
   const { customer, logout } = useAuth();
   const navigate = useNavigate();
 
-  if (!customer) return null;
-  const name = `${customer.firstName} ${customer.lastName}`.trim();
-  const email = customer.email;
+  console.log('ProfileDropdown rendering, customer:', customer);
+
+  const name = customer
+    ? `${customer.firstName} ${customer.lastName}`
+    : `${USER_PROFILE.firstName} ${USER_PROFILE.lastName}`;
+  const email = customer?.email || USER_PROFILE.email;
 
   const show = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -69,7 +73,7 @@ export function ProfileDropdown() {
                 try {
                   await logout();
                   navigate('/');
-                } catch {
+                } catch (error) {
                   toast.error('Failed to sign out');
                 }
               }}
