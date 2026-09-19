@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { MobileNavbar } from '../../../components/layout/MobileNavbar';
+import { MobileFooter } from '../../../components/layout/MobileFooter';
 import { ListingHeader } from '../../../components/layout/ListingHeader';
 import { Footer } from '../../../components/layout/Footer';
 import { LoadingState, ErrorState } from '../../../components/common/States';
@@ -99,7 +101,18 @@ export function ProductListingPage() {
 
   return (
     <div id="view-listing" className="mb-page-fade">
-      <div id="listing-page">
+      <div className="mb-mobile-shell">
+        <MobileNavbar />
+        {/* Mobile product listing would go here - for now using desktop version scaled down */}
+        <div style={{ padding: '16px' }}>
+          <h2 style={{ fontSize: '18px', marginBottom: '12px', textAlign: 'center' }}>{capitalize(mood.title)}</h2>
+          <ProductGrid products={products} materialLabel={materialLabel} columns={2} />
+        </div>
+        <MobileFooter />
+      </div>
+
+      <div className="mb-desktop-only">
+        <div id="listing-page">
         <ListingHeader activeMoodId={mood.id} />
 
         <div id="listing-hero">
@@ -152,6 +165,7 @@ export function ProductListingPage() {
         </div>
       </div>
       <Footer />
+      </div>
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { MobileNavbar } from '../../../components/layout/MobileNavbar';
+import { MobileFooter } from '../../../components/layout/MobileFooter';
 import { SimpleNavbar } from '../../../components/layout/SimpleNavbar';
 import { BagIcon } from '../../../components/common/Icons';
 import { useCart } from '../../../app/providers/CartProvider';
@@ -25,6 +27,16 @@ export function CartPage() {
 
   return (
     <div id="view-cart" className="mb-page-fade">
+      <div className="mb-mobile-shell">
+        <MobileNavbar />
+        <div style={{ padding: '16px' }}>
+          <h1 style={{ fontSize: '18px', marginBottom: '12px' }}>Your Bag ({count})</h1>
+          {/* Mobile cart content */}
+        </div>
+        <MobileFooter />
+      </div>
+
+      <div className="mb-desktop-only">
       <div id="cart-page">
         <SimpleNavbar
           navId="cart-navbar"
@@ -80,6 +92,7 @@ export function CartPage() {
             />
           )}
         </div>
+      </div>
       </div>
     </div>
   );

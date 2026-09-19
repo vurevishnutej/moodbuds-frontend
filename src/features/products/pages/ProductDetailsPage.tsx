@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { MobileNavbar } from '../../../components/layout/MobileNavbar';
+import { MobileFooter } from '../../../components/layout/MobileFooter';
 import { SimpleNavbar } from '../../../components/layout/SimpleNavbar';
 import { Footer } from '../../../components/layout/Footer';
 import { LoadingState, ErrorState } from '../../../components/common/States';
@@ -55,6 +57,17 @@ export function ProductDetailsPage() {
 
   return (
     <div id="view-product" className="mb-page-fade">
+      <div className="mb-mobile-shell">
+        <MobileNavbar />
+        <div style={{ padding: '16px' }}>
+          {/* Mobile product details would go here */}
+          <h1 style={{ fontSize: '18px', marginBottom: '8px' }}>{product.name}</h1>
+          <p style={{ fontSize: '14px', color: '#666' }}>{product.brand}</p>
+        </div>
+        <MobileFooter />
+      </div>
+
+      <div className="mb-desktop-only">
       <SimpleNavbar
         navId="pd-navbar"
         innerClassName="pd-nav-inner"
@@ -195,6 +208,7 @@ export function ProductDetailsPage() {
       )}
 
       <Footer />
+      </div>
     </div>
   );
 }
