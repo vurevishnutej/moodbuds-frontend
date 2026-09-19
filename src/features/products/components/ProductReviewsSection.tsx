@@ -59,7 +59,27 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
     try {
       const response = await apiClient.get<ReviewsPageResponse>(`/products/${productSlug}/reviews?page=${currentPage + 1}&size=${pageSize}`);
       setDisplayedReviews((prev) => [...prev, ...response.content]);
-      setCurrentPage((prev) => prev + 1);
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+
+      // Auto-scroll to show newly loaded reviews (slide effect)
+      setTimeout(() => {
+        if (containerRef.current) {
+          const reviewCards = containerRef.current.querySelectorAll('.review-card');
+          if (reviewCards.length > pageSize) {
+            // Scroll to show the start of the new batch
+            const newBatchStartIndex = nextPage * pageSize;
+            const targetCard = reviewCards[newBatchStartIndex];
+            if (targetCard) {
+              const scrollPosition = (targetCard as HTMLElement).offsetTop;
+              containerRef.current.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth',
+              });
+            }
+          }
+        }
+      }, 50);
     } catch {
       setError('Could not load more reviews');
     } finally {
