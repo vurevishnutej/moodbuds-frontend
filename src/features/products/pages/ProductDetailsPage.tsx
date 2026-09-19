@@ -12,6 +12,7 @@ import { useBodyViewClass } from '../../../hooks/useBodyViewClass';
 import { ProductAccordion } from '../components/ProductAccordion';
 import { ProductCard } from '../components/ProductCard';
 import { ProductGallery } from '../components/ProductGallery';
+import { ProductReviewsSection } from '../components/ProductReviewsSection';
 import { MOOD_MATERIAL } from '../../../data/moodPalette';
 import type { MoodId } from '../../../types';
 
@@ -174,6 +175,8 @@ export function ProductDetailsPage() {
               { title: 'Shipping & returns', body: 'Standard delivery 3–5 days. Express delivery 1–2 days. Free returns within 30 days. Items must be unworn with tags attached.' },
             ]}
           />
+
+          <ProductReviewsSection productSlug={product.id} pageSize={3} />
         </div>
       </div>
 
