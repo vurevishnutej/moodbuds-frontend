@@ -8,6 +8,7 @@ import { useWishlist } from '../../../app/providers/WishlistProvider';
 import { CartItemRow } from '../components/CartItemRow';
 import { PriceSummary } from '../components/PriceSummary';
 import { useBodyViewClass } from '../../../hooks/useBodyViewClass';
+import { formatINR } from '../../../utils/format';
 import type { CartItem } from '../../../types';
 
 export function CartPage() {
