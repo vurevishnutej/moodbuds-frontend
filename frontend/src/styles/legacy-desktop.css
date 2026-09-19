@@ -24,27 +24,35 @@ body{width:100%;min-height:100vh;font-family:'Inter',sans-serif;
   pointer-events:none;overflow:hidden;
 }
 
-/* HIDE EMOJIS ON CHECKOUT PAGE */
-#view-checkout .view-emoji-bg,
-body.view-checkout .view-emoji-bg,
-body.checkout .view-emoji-bg {
+/* HIDE EMOJIS GLOBALLY - AGGRESSIVE RULES */
+.view-emoji-bg,
+[class*="emoji-bg"],
+.dp-far,
+.dp-mid,
+.dp-near,
+.view-emoji-bg > *,
+.view-emoji-bg span {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   width: 0 !important;
   height: 0 !important;
+  overflow: hidden !important;
   position: absolute !important;
-  top: -9999px !important;
-  left: -9999px !important;
-  z-index: -9999 !important;
+  top: -99999px !important;
+  left: -99999px !important;
+  z-index: -99999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
-/* Hide emoji spans directly on checkout */
-#view-checkout [class*="dp-"],
-#view-checkout span[class*="dp-"],
-.view-emoji-bg .dp-far,
-.view-emoji-bg .dp-mid,
-.view-emoji-bg .dp-near {
+/* HIDE EMOJIS ON CHECKOUT PAGE - ADDITIONAL SPECIFICITY */
+#view-checkout .view-emoji-bg,
+body.view-checkout .view-emoji-bg,
+body.checkout .view-emoji-bg,
+#checkout-page .view-emoji-bg,
+#checkout-page .view-emoji-bg * {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;

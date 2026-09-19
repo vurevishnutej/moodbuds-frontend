@@ -44,8 +44,8 @@ export function CheckoutPage() {
   };
 
   return (
-    <div id="view-checkout">
-      <div id="checkout-page">
+    <div id="view-checkout" style={{ background: '#fff', position: 'relative', zIndex: 10, minHeight: '100vh' }}>
+      <div id="checkout-page" style={{ position: 'relative', zIndex: 11 }}>
         {/* Navbar */}
         <nav className={styles.checkoutNavbar}>
           <div className={styles.navInner}>
