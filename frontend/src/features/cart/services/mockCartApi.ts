@@ -1,8 +1,8 @@
-import type { Cart, CartItem, WishlistItem, AddToCartRequest, UpdateCartItemRequest, CheckoutResult } from '../../../types';
+import type { Cart, CartItem, WishlistItem, AddToCartRequest, UpdateCartItemRequest } from '../../../types';
 import { CART_SEED } from '../../../data/cartSeed';
 import { storage, STORAGE_KEYS } from '../../../services/storage/storageService';
 import { delay, uniqueId } from '../../../utils/format';
-import type { CartApi, CheckoutApi } from './cartApi';
+import type { CartApi } from './cartApi';
 
 const FREE_DELIVERY_THRESHOLD = 999;
 const STANDARD_DELIVERY_FEE = 99;
@@ -128,14 +128,5 @@ export const mockCartApi: CartApi = {
     writeItems([]);
     writePromo(null);
     return computeCart();
-  },
-};
-
-export const mockCheckoutApi: CheckoutApi = {
-  async checkout(_cart: Cart) {
-    await delay(600);
-    const result: CheckoutResult = { success: true, orderId: 'MB-DEMO-' + Math.floor(10000 + Math.random() * 89999) };
-    await mockCartApi.clearCart();
-    return result;
   },
 };

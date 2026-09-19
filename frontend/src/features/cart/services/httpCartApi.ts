@@ -1,6 +1,6 @@
 import type { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest } from '../../../types';
 import { apiClient } from '../../../services/api/apiClient';
-import type { CartApi, CheckoutApi } from './cartApi';
+import type { CartApi } from './cartApi';
 
 interface CartItemResponse {
   id: number;
@@ -142,19 +142,5 @@ export const httpCartApi: CartApi = {
   async clearCart(): Promise<Cart> {
     const response = await apiClient.delete<CartResponse>('/customer/cart');
     return mapCartResponse(response);
-  },
-};
-
-/**
- * Checkout API for placing orders
- */
-export const httpCheckoutApi: CheckoutApi = {
-  async checkout(_cart: Cart) {
-    // This would be handled by the order API
-    return {
-      success: true,
-      orderId: '',
-      message: 'Order placed successfully',
-    };
   },
 };

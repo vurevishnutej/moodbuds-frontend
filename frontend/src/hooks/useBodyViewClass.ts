@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export type ViewName = 'home' | 'listing' | 'cart' | 'wishlist' | 'product' | 'profile';
+export type ViewName = 'home' | 'listing' | 'cart' | 'checkout' | 'wishlist' | 'product' | 'profile';
 
 /**
  * The ported legacy CSS hides every `#view-*` container by default and only

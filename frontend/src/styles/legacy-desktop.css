@@ -1167,16 +1167,18 @@ body.quiz-open #site-footer{display:none;}
 }
 
 
-#view-home,#view-listing,#view-cart,#view-wishlist,#view-product,#view-profile{display:none;}
+#view-home,#view-listing,#view-cart,#view-checkout,#view-wishlist,#view-product,#view-profile{display:none;}
 body.view-home #view-home{display:block;}
 body.view-listing #view-listing{display:block;}
 body.view-cart #view-cart{display:block;}
+body.view-checkout #view-checkout{display:block;}
 body.view-wishlist #view-wishlist{display:block;}
 body.view-product #view-product{display:block;}
 body.view-profile #view-profile{display:block;}
 body.view-home{overflow-x:hidden;}
 body.view-listing{overflow-x:auto;}
 body.view-cart{overflow-x:hidden;background:#fff;}
+body.view-checkout{overflow-x:hidden;background:#fff;}
 body.view-wishlist{overflow-x:hidden;background:#fff;}
 body.view-product{overflow-x:hidden;background:#fff;}
 body.view-profile{overflow-x:hidden;background:#fff;}

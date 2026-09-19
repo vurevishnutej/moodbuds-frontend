@@ -1,4 +1,4 @@
-import type { Cart, AddToCartRequest, UpdateCartItemRequest, CheckoutResult } from '../../../types';
+import type { Cart, AddToCartRequest, UpdateCartItemRequest } from '../../../types';
 
 export interface CartApi {
   getCart(): Promise<Cart>;
@@ -9,8 +9,4 @@ export interface CartApi {
   applyPromoCode(code: string): Promise<Cart>;
   removePromoCode(): Promise<Cart>;
   clearCart(): Promise<Cart>;
-}
-
-export interface CheckoutApi {
-  checkout(cart: Cart): Promise<CheckoutResult>;
 }

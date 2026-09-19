@@ -1,0 +1,12 @@
+.overlay{position:fixed;inset:0;z-index:600;background:rgba(15,15,18,.56);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;color:#111;font-family:'Inter',sans-serif;box-shadow:0 24px 80px rgba(0,0,0,.22)}
+.header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:19px 24px;border-bottom:1px solid #ececec;background:#fff}
+.header h2{font:700 21px 'Playfair Display',serif}.header button{border:0;background:none;color:#888;font-size:26px;line-height:1;cursor:pointer}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:15px 17px;padding:24px}
+.form label,.form fieldset{display:flex;flex-direction:column;gap:6px;border:0;margin:0;padding:0;color:#777;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.form label span{color:#aaa;font-weight:400;letter-spacing:0;text-transform:none}
+.form input{width:100%;height:43px;border:1px solid #ddd;background:#fff;color:#111;padding:0 12px;font:400 13px 'Inter',sans-serif;outline:none}
+.form input:focus{border-color:#111}.full{grid-column:1/-1}.types{display:flex;gap:8px;margin-top:2px}.types button{border:1px solid #ddd;background:#fff;color:#666;padding:9px 18px;font:600 12px 'Inter',sans-serif;cursor:pointer}.types .activeType{border-color:#111;background:#111;color:#fff}
+.form .checkbox{flex-direction:row;align-items:center;gap:9px;font-size:12px;font-weight:500;letter-spacing:0;text-transform:none;color:#444}.checkbox input{width:16px;height:16px;accent-color:#111}
+.actions{display:flex;flex-direction:row;gap:12px;padding-top:5px}.actions button{flex:1;padding:14px;border:1px solid #111;font:700 11px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.cancel{background:#fff;color:#111}.save{background:#111;color:#fff}.save:disabled{opacity:.5;cursor:wait}
+@media(max-width:640px){.overlay{padding:0;align-items:flex-end}.modal{max-height:96vh}.form{grid-template-columns:1fr;padding:20px}.full{grid-column:1}.header{padding:17px 20px}}

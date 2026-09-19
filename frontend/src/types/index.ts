@@ -121,8 +121,3 @@ export interface QuizResult {
   emoji: string;
   line: string;
 }
-
-export interface CheckoutResult {
-  success: boolean;
-  orderId: string;
-}
