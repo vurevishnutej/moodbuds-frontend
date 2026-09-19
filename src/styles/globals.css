@@ -1,12 +1,8 @@
-/* ── Signature background pattern (fashion line-art, tiled) ── */
-/* Home page only — body pattern shows through #view-home since it has no
-   opaque background of its own. Every other view (#view-cart, #view-product,
-   #view-profile, #admin-stage, #view-listing, etc.) keeps its solid legacy
-   background color, which naturally blocks the pattern — nothing extra needed. */
+/* ── Background (pattern removed) ── */
 body {
-  background-image: url('/patterns/fashion-tile.svg'), linear-gradient(180deg, #fafaf8 0%, #fafaf8 100%);
-  background-repeat: repeat, no-repeat;
-  background-size: 240px 240px, auto;
+  background-image: linear-gradient(180deg, #fafaf8 0%, #fafaf8 100%);
+  background-repeat: no-repeat;
+  background-size: auto;
 }
 
 /* .section applies a translucent white wash (originally tuned to soften the

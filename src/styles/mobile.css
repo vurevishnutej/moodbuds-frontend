@@ -193,9 +193,6 @@
 /* ── Mobile home content ── */
 .mmb-home {
   background-color: #fafaf8;
-  background-image: url('/patterns/fashion-tile.svg');
-  background-repeat: repeat;
-  background-size: 240px 240px;
   min-height: 100vh;
   padding-bottom: 0;
   position: relative;
@@ -546,19 +543,14 @@
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.58) 100%);
 }
-.mmb-mood-cell-emoji {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 1;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
+.mmb-mood-cell-emoji,
+.mmb-mood-cell-emoji * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  font-size: 0 !important;
 }
 .mmb-mood-cell-lbl {
   position: absolute;
@@ -585,16 +577,24 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 14px 30px rgba(26, 10, 46, 0.32);
 }
-.mmb-quiz-emoji-field {
+.mmb-quiz-emoji-field,
+.mmb-quiz-emoji-field * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  font-size: 0 !important;
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 .mmb-quiz-emoji-field span {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
   position: absolute;
-  font-size: var(--s);
-  opacity: var(--o);
-  animation: mmbNodFM var(--d) var(--dl) ease-in-out infinite;
+  animation: none !important;
 }
 @keyframes mmbNodFM {
   0%, 100% { transform: translateY(0) rotate(0deg); }

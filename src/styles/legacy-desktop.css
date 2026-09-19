@@ -2868,7 +2868,23 @@ body.quiz-open{overflow:hidden;}
 }
 
 /* Hide emoji entirely */
-#quiz-result-emoji{display:none;}
+#quiz-result-emoji,
+.view-emoji-bg,
+#transition-wallpaper,
+#find-mood-wall,
+.fm-icon,
+.dp-far,
+.dp-mid,
+.dp-near,
+.view-emoji-bg *,
+#find-mood-wall * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  font-size: 0 !important;
+}
 
 #quiz-result-eyebrow{
   display:block;
