@@ -1,0 +1,11 @@
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+backend/target/
+backend/*.log
+*.log
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
