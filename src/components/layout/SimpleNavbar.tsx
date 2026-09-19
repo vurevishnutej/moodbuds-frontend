@@ -26,13 +26,7 @@ export function SimpleNavbar({
   const navigate = useNavigate();
 
   const goBack = () => {
-    if (backTo) {
-      navigate(backTo);
-    } else if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
+    navigate(backTo || '/');
   };
 
   return (
