@@ -33,6 +33,7 @@ export interface ProductTag {
 
 export interface Product {
   id: string;
+  slug?: string;
   name: string;
   brand: string;
   moodId: MoodId;
@@ -40,6 +41,7 @@ export interface Product {
   originalPrice?: number | null;
   badge?: 'Sale' | 'New' | null;
   image: string;
+  images?: string[];
   sizes: string[];
   colors: { name: string; hex: string }[];
   rating: number;

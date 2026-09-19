@@ -601,11 +601,15 @@ CREATE TABLE refunds (
   amount INT UNSIGNED NOT NULL,
   initiated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   completed_at DATETIME,
+  provider_reference_id VARCHAR(255),
+  failure_description VARCHAR(1000),
+  next_retry_at DATETIME,
   PRIMARY KEY (id),
   UNIQUE KEY uq_refunds_order_idempotency (order_id, idempotency_key),
   KEY idx_refunds_order (order_id),
   KEY idx_refunds_user (user_id),
-  KEY idx_refunds_status (status)
+  KEY idx_refunds_status (status),
+  KEY idx_refunds_next_retry (next_retry_at)
 );
 
 CREATE TABLE refund_items (

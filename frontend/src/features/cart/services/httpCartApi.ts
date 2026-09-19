@@ -82,7 +82,7 @@ export const httpCartApi: CartApi = {
    */
   async addToCart(request: AddToCartRequest): Promise<Cart> {
     const payload: AddCartItemRequest = {
-      productSlug: request.product.id, // Assuming product.id is the slug
+      productSlug: request.product.slug || request.product.id, // Use slug, fallback to id
       size: request.size,
       color: request.color || undefined,
       quantity: request.qty || 1,

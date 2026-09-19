@@ -25,7 +25,7 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
     <div
       className="product-card"
       style={{ cursor: 'pointer' }}
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={() => navigate(`/product/${product.slug || product.id}`)}
     >
       <div className={`product-media ${imageLoaded ? 'img-loaded' : ''}`}>
         <span className="product-label">{materialLabel}</span>

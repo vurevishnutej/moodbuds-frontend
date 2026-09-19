@@ -58,15 +58,24 @@ export const httpWishlistApi = {
    */
   async addToWishlist(product: any): Promise<WishlistItem[]> {
     const payload = {
-      productSlug: product.id,
+      productSlug: product.slug || product.id,
       size: undefined,
     };
 
-    const response = await apiClient.post<WishlistResponse>(
+    const response = await apiClient.post<WishlistItemResponse>(
       '/customer/wishlist/items',
       payload
     );
-    return mapWishlistResponse(response).items;
+    return [{
+      id: String(response.id),
+      productId: response.productId,
+      productName: response.productName,
+      productBrand: response.productBrand,
+      productImage: response.productImage,
+      price: response.price,
+      size: response.size || null,
+      color: response.color || null,
+    }];
   },
 
   /**
@@ -94,6 +103,9 @@ export const httpWishlistApi = {
     const response = await apiClient.delete<WishlistResponse>(
       `/customer/wishlist/items/${itemId}`
     );
+    if (!response || !response.items) {
+      return [];
+    }
     return mapWishlistResponse(response).items;
   },
 };

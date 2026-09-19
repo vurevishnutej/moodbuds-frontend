@@ -43,6 +43,12 @@ export function ProductDetailsPage() {
   const materialLabel = MOOD_MATERIAL[product.moodId as MoodId];
 
   const handleAddToCart = () => {
+    console.log('[ProductDetailsPage] Adding to cart:', {
+      product: product.name,
+      size: selectedSize,
+      color: product.colors[colorIdx]?.name,
+      qty,
+    });
     addToCart(product, selectedSize, product.colors[colorIdx]?.name ?? null, qty);
   };
 

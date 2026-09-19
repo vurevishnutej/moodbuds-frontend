@@ -27,12 +27,11 @@ export function CreateProductPage() {
     const regularPrice = mrp > sellingPrice ? mrp : sellingPrice;
     const discountPrice = mrp > sellingPrice ? sellingPrice : null;
 
-    const stock = Number(value.stock) || 0;
-    const sizes = value.sizes.map((size) => ({ size, stockQuantity: stock }));
-
     if (publish) {
-      if (sizes.length === 0) return toast.error('Add at least one size before publishing');
-      if (stock <= 0) return toast.error('Add stock quantity before publishing');
+      if (value.sizeStocks.length === 0) return toast.error('Add at least one size before publishing');
+      if (value.sizeStocks.some((s) => s.stockQuantity <= 0)) {
+        return toast.error('All selected sizes must have stock quantity > 0');
+      }
       if (value.images.length < 3) return toast.error('Add at least 3 images before publishing');
       if (value.moodIds.length === 0) return toast.error('Select at least one mood before publishing');
     }

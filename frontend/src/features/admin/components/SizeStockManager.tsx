@@ -16,6 +16,7 @@ const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 export function SizeStockManager({ value, onChange }: SizeStockManagerProps) {
   const [globalThreshold, setGlobalThreshold] = useState<string>('5');
+  const [globalStock, setGlobalStock] = useState<string>('0');
 
   const updateSize = (size: string, field: keyof SizeStock, newValue: any) => {
     const updated = value.map((s) =>
@@ -58,6 +59,52 @@ export function SizeStockManager({ value, onChange }: SizeStockManagerProps) {
           </label>
         ))}
       </div>
+
+      {/* Apply stock to all selected sizes */}
+      {value.length > 0 && (
+        <div style={{ marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+          <div style={{ flex: 1, minWidth: '120px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: '#666' }}>
+              Apply stock to all
+            </label>
+            <input
+              type="number"
+              value={globalStock}
+              onChange={(e) => setGlobalStock(e.target.value)}
+              min="0"
+              placeholder="Enter stock qty"
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px',
+              }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const qty = Math.max(0, Number(globalStock) || 0);
+              const updated = value.map((s) => ({ ...s, stockQuantity: qty }));
+              onChange(updated);
+            }}
+            style={{
+              padding: '8px 16px',
+              background: '#333',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '14px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Apply to All
+          </button>
+        </div>
+      )}
 
       {/* Stock management table */}
       {value.length > 0 ? (

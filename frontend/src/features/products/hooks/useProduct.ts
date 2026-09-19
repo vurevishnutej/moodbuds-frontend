@@ -20,17 +20,26 @@ export function useProduct(id: string | undefined): UseProductResult {
     let cancelled = false;
     setLoading(true);
     setError(null);
+    console.log('[useProduct] Fetching product:', id);
     productService
       .getProductById(id)
       .then(async (p) => {
         if (cancelled) return;
+        console.log('[useProduct] Got product:', p);
+        if (!p) {
+          if (!cancelled) setError(`Product "${id}" not found`);
+          return;
+        }
         setProduct(p);
-        if (p) {
+        try {
           const rel = await productService.getRelatedProducts(p);
           if (!cancelled) setRelated(rel);
+        } catch (relErr) {
+          console.error('[useProduct] Failed to fetch related:', relErr);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('[useProduct] Error fetching product:', err);
         if (!cancelled) setError('Could not load this product right now.');
       })
       .finally(() => {

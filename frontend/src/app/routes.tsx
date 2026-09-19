@@ -4,6 +4,7 @@ import { ProductListingPage } from '../features/products/pages/ProductListingPag
 import { ProductDetailsPage } from '../features/products/pages/ProductDetailsPage';
 import { SearchResultsPage } from '../features/products/pages/SearchResultsPage';
 import { CartPage } from '../features/cart/pages/CartPage';
+import { CheckoutPage } from '../features/checkout/pages/CheckoutPage';
 import { WishlistPage } from '../features/wishlist/pages/WishlistPage';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { RegisterPage } from '../features/auth/pages/RegisterPage';
@@ -55,6 +56,7 @@ export function AppRoutes() {
 
       {/* User Routes (Protected) */}
       <Route path="/cart" element={<CartPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/wishlist" element={<WishlistPage />} />
 
       <Route path="/profile" element={<ProfileLayout />}>
