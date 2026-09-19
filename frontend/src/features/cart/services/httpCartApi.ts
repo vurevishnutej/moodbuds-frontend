@@ -8,6 +8,16 @@ interface AddCartItemRequest {
   quantity: number;
 }
 
+// Convert relative image URLs to absolute URLs
+function toAbsoluteUrl(url: string | undefined): string {
+  if (!url) return '/placeholder-product.jpg';
+  if (url.startsWith('http')) return url;
+
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+  const origin = baseUrl.split('/api/v1')[0] || window.location.origin;
+  return origin + url;
+}
+
 /**
  * Convert API CartResponse to frontend Cart format
  */
@@ -22,7 +32,7 @@ function mapCartResponse(response: any): Cart {
     qty: item.quantity || 0,
     size: item.size || '',
     color: null,
-    image: item.primaryImageUrl || '/placeholder-product.jpg',
+    image: toAbsoluteUrl(item.primaryImageUrl),
     moodId: 'happy',
   })) as CartItem[] || [];
 
