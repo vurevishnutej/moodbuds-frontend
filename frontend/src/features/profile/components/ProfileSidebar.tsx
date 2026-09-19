@@ -30,7 +30,7 @@ export function ProfileSidebar() {
     try {
       await logout();
       navigate('/');
-    } catch {
+    } catch (error) {
       toast.error('Failed to sign out');
     }
   };
@@ -63,6 +63,12 @@ export function ProfileSidebar() {
             <span className="prof-nav-arrow">›</span>
           </NavLink>
         ))}
+        <div className="prof-nav-divider" />
+        <NavLink to="/profile/admin" className={({ isActive }) => `prof-nav-item prof-nav-admin${isActive ? ' active' : ''}`}>
+          <span>Admin Panel</span>
+          <span className="prof-admin-tag">Admin</span>
+          <span className="prof-nav-arrow">›</span>
+        </NavLink>
         <div className="prof-nav-divider" />
         <button type="button" className="prof-nav-item prof-nav-logout" onClick={handleLogout}>
           <span>Sign Out</span>

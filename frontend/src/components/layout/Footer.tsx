@@ -67,7 +67,7 @@ export function Footer() {
             <li><a href="#">Track My Order</a></li>
             <li><a href="#">Returns &amp; Exchanges</a></li>
             <li><a href="#">Shipping Info</a></li>
-            <li><Link to="/contact-us">Contact Us</Link></li>
+            <li><a href="#">Contact Us</a></li>
             <li><a href="#">FAQs</a></li>
           </ul>
         </div>
@@ -75,7 +75,7 @@ export function Footer() {
         <div>
           <span className="mbf-col-head">Company</span>
           <ul className="mbf-links">
-            <li><Link to="/about-us">About MoodBuds</Link></li>
+            <li><a href="#">About MoodBuds</a></li>
             <li><a href="#">Sustainability</a></li>
             <li><a href="#">Careers</a></li>
             <li><a href="#">Press &amp; Media</a></li>

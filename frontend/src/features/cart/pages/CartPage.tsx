@@ -1,23 +1,18 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SimpleNavbar } from '../../../components/layout/SimpleNavbar';
 import { BagIcon } from '../../../components/common/Icons';
 import { useCart } from '../../../app/providers/CartProvider';
 import { useWishlist } from '../../../app/providers/WishlistProvider';
-import { useToast } from '../../../app/providers/ToastProvider';
 import { CartItemRow } from '../components/CartItemRow';
 import { PriceSummary } from '../components/PriceSummary';
-import { checkoutService } from '../services/cartService';
 import { useBodyViewClass } from '../../../hooks/useBodyViewClass';
 import type { CartItem } from '../../../types';
 
 export function CartPage() {
   useBodyViewClass('cart');
-  const { cart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh } = useCart();
+  const { cart, updateQty, removeItem, applyPromoCode } = useCart();
   const { toggleWishlist } = useWishlist();
-  const toast = useToast();
   const navigate = useNavigate();
-  const [checkingOut, setCheckingOut] = useState(false);
 
   const count = cart.items.reduce((s, i) => s + i.qty, 0);
 
@@ -40,15 +35,8 @@ export function CartPage() {
     await removeItem(item.id);
   };
 
-  const handleCheckout = async () => {
-    setCheckingOut(true);
-    const result = await checkoutService.checkout(cart);
-    setCheckingOut(false);
-    if (result.success) {
-      toast.success(`Order placed — ${result.orderId}`);
-      await refresh();
-      navigate('/profile/orders');
-    }
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   return (
@@ -102,9 +90,8 @@ export function CartPage() {
             <PriceSummary
               cart={cart}
               onApplyPromo={applyPromoCode}
-              onRemovePromo={removePromoCode}
               onCheckout={handleCheckout}
-              checkingOut={checkingOut}
+              checkingOut={false}
             />
           )}
         </div>

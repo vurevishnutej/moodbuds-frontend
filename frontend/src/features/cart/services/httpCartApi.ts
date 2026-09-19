@@ -1,62 +1,51 @@
-import type { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest } from '../../../types';
+import type { Cart, CartItem, AddToCartRequest } from '../../../types';
 import { apiClient } from '../../../services/api/apiClient';
 import type { CartApi, CheckoutApi } from './cartApi';
-
-interface CartItemResponse {
-  id: number;
-  productId: number;
-  productSlug: string;
-  productName: string;
-  primaryImageUrl: string;
-  currentUnitPrice: number;
-  effectiveUnitPrice: number;
-  quantity: number;
-  size: string;
-}
-
-interface CartResponse {
-  cartId: number;
-  items: CartItemResponse[];
-  totals: { mrpSubtotal:number; productDiscount:number; sellingSubtotal:number; gstAmount:number; grandTotal:number };
-}
-
-interface CouponCartResponse { applied:boolean; coupon?:{code:string}|null; totals:{productDiscount:number;sellingSubtotal:number;couponDiscount:number;grandTotal:number}; cart:CartResponse; }
 
 interface AddCartItemRequest {
   productSlug: string;
   size: string;
-  color?: string;
   quantity: number;
 }
 
-interface UpdateCartItemPayload {
-  quantity?: number;
-  size?: string;
+// Convert relative image URLs to absolute URLs
+function toAbsoluteUrl(url: string | undefined): string {
+  if (!url) return '/placeholder-product.jpg';
+  if (url.startsWith('http')) return url;
+
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+  const origin = baseUrl.split('/api/v1')[0] || window.location.origin;
+  return origin + url;
 }
 
 /**
  * Convert API CartResponse to frontend Cart format
  */
-function mapCartResponse(response: CartResponse, coupon?: CouponCartResponse): Cart {
+function mapCartResponse(response: any): Cart {
+  const items = response.items?.map((item: any) => ({
+    id: String(item.id),
+    productId: String(item.productId),
+    name: item.productName || 'Product',
+    brand: 'MoodBuds',
+    price: item.effectiveUnitPrice || item.currentUnitPrice || 0,
+    originalPrice: item.currentUnitDiscountPrice ? item.currentUnitPrice : null,
+    qty: item.quantity || 0,
+    size: item.size || '',
+    color: null,
+    image: toAbsoluteUrl(item.primaryImageUrl),
+    moodId: 'happy',
+  })) as CartItem[] || [];
+
+  const totals = response.totals || { sellingSubtotal: 0, gstAmount: 0, grandTotal: 0, productDiscount: 0 };
+
   return {
-    items: response.items.map(item => ({
-      id: String(item.id),
-      productId: item.productSlug || String(item.productId),
-      name: item.productName,
-      brand: '',
-      price: item.effectiveUnitPrice / 100,
-      originalPrice: item.currentUnitPrice > item.effectiveUnitPrice ? item.currentUnitPrice / 100 : null,
-      qty: item.quantity,
-      size: item.size,
-      color: null,
-      image: item.primaryImageUrl,
-    })) as CartItem[],
-    subtotal: (coupon?.totals.sellingSubtotal ?? response.totals.sellingSubtotal) / 100,
-    savings: (coupon?.totals.productDiscount ?? response.totals.productDiscount) / 100,
+    items,
+    subtotal: totals.sellingSubtotal || 0,
+    savings: totals.productDiscount || 0,
     delivery: 0,
-    discount: (coupon?.totals.couponDiscount ?? 0) / 100,
-    total: (coupon?.totals.grandTotal ?? response.totals.grandTotal) / 100,
-    promoCode: coupon?.coupon?.code || null,
+    discount: 0,
+    total: totals.grandTotal || 0,
+    promoCode: null,
   };
 }
 
@@ -68,7 +57,7 @@ export const httpCartApi: CartApi = {
    * GET /customer/cart - Get authenticated customer's cart
    */
   async getCart(): Promise<Cart> {
-    const response = await apiClient.get<CartResponse>('/customer/cart');
+    const response = await apiClient.get<any>('/customer/cart');
     return mapCartResponse(response);
   },
 
@@ -77,25 +66,24 @@ export const httpCartApi: CartApi = {
    */
   async addToCart(request: AddToCartRequest): Promise<Cart> {
     const payload: AddCartItemRequest = {
-      productSlug: request.product.id, // Assuming product.id is the slug
+      productSlug: request.product.slug || String(request.product.id),
       size: request.size,
-      color: request.color || undefined,
       quantity: request.qty || 1,
     };
 
-    const response = await apiClient.post<CartResponse>('/customer/cart/items', payload);
+    const response = await apiClient.post<any>('/customer/cart/items', payload);
     return mapCartResponse(response);
   },
 
   /**
    * PATCH /customer/cart/items/{itemId} - Update cart item
    */
-  async updateCartItem(request: UpdateCartItemRequest): Promise<Cart> {
-    const payload: UpdateCartItemPayload = {};
+  async updateCartItem(request: any): Promise<Cart> {
+    const payload: any = {};
     if (request.qty !== undefined) payload.quantity = request.qty;
+    if (request.size !== undefined) payload.size = request.size;
     if (request.itemId !== undefined) {
-      // itemId is in the request but used in URL
-      const response = await apiClient.patch<CartResponse>(
+      const response = await apiClient.patch<any>(
         `/customer/cart/items/${request.itemId}`,
         payload
       );
@@ -108,30 +96,27 @@ export const httpCartApi: CartApi = {
    * DELETE /customer/cart/items/{itemId} - Remove item from cart
    */
   async removeCartItem(itemId: string): Promise<Cart> {
-    const response = await apiClient.delete<CartResponse>(`/customer/cart/items/${itemId}`);
+    const response = await apiClient.delete<any>(`/customer/cart/items/${itemId}`);
     return mapCartResponse(response);
   },
 
   /**
-   * POST /customer/cart/coupon - Apply promo code
+   * POST /customer/cart - Apply promo code
    */
   async applyPromoCode(code: string): Promise<Cart> {
-    const response = await apiClient.post<CouponCartResponse>('/customer/cart/coupon', {
-      code,
-    });
-    return mapCartResponse(response.cart, response);
-  },
-
-  async removePromoCode(): Promise<Cart> {
-    const response = await apiClient.delete<CouponCartResponse>('/customer/cart/coupon');
-    return mapCartResponse(response.cart, response);
+    try {
+      const response = await apiClient.post<any>('/customer/cart/apply-coupon', { code });
+      return mapCartResponse(response);
+    } catch (error) {
+      throw new Error(`Invalid promo code: ${code}`);
+    }
   },
 
   /**
    * DELETE /customer/cart - Clear cart
    */
   async clearCart(): Promise<Cart> {
-    const response = await apiClient.delete<CartResponse>('/customer/cart');
+    const response = await apiClient.delete<any>('/customer/cart');
     return mapCartResponse(response);
   },
 };
@@ -140,7 +125,7 @@ export const httpCartApi: CartApi = {
  * Checkout API for placing orders
  */
 export const httpCheckoutApi: CheckoutApi = {
-  async checkout(_cart: Cart) {
+  async checkout(cart: Cart) {
     // This would be handled by the order API
     return {
       success: true,

@@ -6,7 +6,6 @@ export interface CartApi {
   updateCartItem(request: UpdateCartItemRequest): Promise<Cart>;
   removeCartItem(itemId: string): Promise<Cart>;
   applyPromoCode(code: string): Promise<Cart>;
-  removePromoCode(): Promise<Cart>;
   clearCart(): Promise<Cart>;
 }
 

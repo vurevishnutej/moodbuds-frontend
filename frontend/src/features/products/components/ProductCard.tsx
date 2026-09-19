@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import type { Product } from '../../../types';
 import { formatINR } from '../../../utils/format';
 import { useWishlist } from '../../../app/providers/WishlistProvider';
@@ -14,6 +15,7 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
   const navigate = useNavigate();
   const { isWishlisted, toggleWishlist } = useWishlist();
   const wishlisted = isWishlisted(product.id);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const discountPct = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
@@ -23,9 +25,9 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
     <div
       className="product-card"
       style={{ cursor: 'pointer' }}
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={() => navigate(`/product/${product.slug || product.id}`)}
     >
-      <div className="product-media">
+      <div className={`product-media ${imageLoaded ? 'img-loaded' : ''}`}>
         <span className="product-label">{materialLabel}</span>
         {product.badge && (
           <div className="product-badges">
@@ -48,8 +50,10 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
         <img
           src={product.image}
           alt={product.name}
+          crossOrigin="anonymous"
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          onLoad={() => setImageLoaded(true)}
         />
         <div className="product-cart-bar">View product</div>
       </div>

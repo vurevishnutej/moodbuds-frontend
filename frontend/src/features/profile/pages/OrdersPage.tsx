@@ -1,34 +1,87 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { ORDERS } from '../../../data/profile';
 import { formatINR } from '../../../utils/format';
-import { profileService, type CustomerOrderSummary } from '../services/profileService';
+import type { OrderStatus } from '../../../types';
+import { useToast } from '../../../app/providers/ToastProvider';
 
-type DisplayStatus = 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-const FILTERS: ('All' | DisplayStatus)[] = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-const statusOf = (status: string): DisplayStatus => {
-  if (status === 'DELIVERED') return 'Delivered';
-  if (status === 'SHIPPED' || status === 'OUT_FOR_DELIVERY') return 'Shipped';
-  if (status === 'CANCELLED' || status === 'REFUNDED' || status === 'PAYMENT_FAILED') return 'Cancelled';
-  return 'Processing';
-};
+const FILTERS: ('All' | OrderStatus)[] = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
 export function OrdersPage() {
-  const [filter, setFilter] = useState<'All' | DisplayStatus>('All');
-  const [orders, setOrders] = useState<CustomerOrderSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const load = async () => { setLoading(true); setError(''); try { setOrders(await profileService.orders()); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not load orders'); } finally { setLoading(false); } };
-  useEffect(() => { void load(); }, []);
-  const filtered = useMemo(() => filter === 'All' ? orders : orders.filter((order) => statusOf(order.status) === filter), [orders, filter]);
+  const [filter, setFilter] = useState<'All' | OrderStatus>('All');
+  const toast = useToast();
 
-  return <div className="prof-panel active">
-    <div className="prof-panel-head"><div className="prof-panel-title">Orders</div><div className="prof-panel-sub">Track and manage purchases stored on your account</div></div>
-    <div className="order-filters">{FILTERS.map((item) => <button key={item} type="button" className={`order-filter-btn${filter === item ? ' active' : ''}`} onClick={() => setFilter(item)}>{item}</button>)}</div>
-    {loading ? <div className="mb-state"><div className="mb-spinner"/><div>Loading your orders…</div></div> : error ? <div className="mb-state"><div className="mb-state-title">Orders could not be loaded</div><div className="mb-state-subtitle">{error}</div><button className="mb-state-retry" onClick={() => void load()}>Try again</button></div> : filtered.length === 0 ? <div className="mb-state"><div className="mb-state-title">No orders here yet</div><div className="mb-state-subtitle">Orders placed with this account will appear here.</div></div> : filtered.map((order) => {
-      const status = statusOf(order.status);
-      return <div className="order-card" key={order.orderNumber}>
-        <div className="order-card-head"><span className="order-id">{order.orderNumber}</span><span className="order-date">{new Date(order.createdAt).toLocaleDateString('en-IN')}</span><span className={`order-status ${status.toLowerCase()}`}>{status}</span></div>
-        <div className="order-items-row"><div className="order-item-imgs">{order.primaryImageUrl && <div className="order-item-img"><img src={order.primaryImageUrl} alt="Order item" /></div>}</div><div className="order-item-info"><div className="order-item-name">{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</div><div className="order-item-meta">Quantity {order.totalQuantity} · {order.paymentMethod.replaceAll('_', ' ')}</div></div><div className="order-total">{formatINR(order.totalAmount / 100)}</div></div>
-      </div>;
-    })}
-  </div>;
+  const filtered = useMemo(
+    () => (filter === 'All' ? ORDERS : ORDERS.filter((o) => o.status === filter)),
+    [filter]
+  );
+
+  return (
+    <div className="prof-panel active">
+      <div className="prof-panel-head">
+        <div className="prof-panel-title">Orders</div>
+        <div className="prof-panel-sub">Track, return or buy things again</div>
+      </div>
+
+      <div className="order-filters">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            type="button"
+            className={`order-filter-btn${filter === f ? ' active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {filtered.map((order) => (
+        <div className="order-card" key={order.id}>
+          <div className="order-card-head">
+            <span className="order-id">{order.id}</span>
+            <span className="order-date">{order.date}</span>
+            <span className={`order-status ${order.status.toLowerCase()}`}>{order.status}</span>
+          </div>
+          <div className="order-items-row">
+            <div className="order-item-imgs">
+              {order.items.map((item, i) => (
+                <div className="order-item-img" key={i}>
+                  <img src={item.image} alt={item.name} />
+                </div>
+              ))}
+            </div>
+            <div className="order-item-info">
+              <div className="order-item-name">
+                {order.items[0]?.name}
+                {order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}
+              </div>
+              <div className="order-item-meta">
+                {order.moodLabel} · Size {order.size}
+                {order.color ? ` · ${order.color}` : ''}
+              </div>
+            </div>
+            <div className="order-total">{formatINR(order.total)}</div>
+          </div>
+          <div className="order-actions">
+            {order.status === 'Delivered' && (
+              <>
+                <button type="button" className="order-btn primary" onClick={() => toast.info('Thanks for the feedback!')}>Rate &amp; Review</button>
+                <button type="button" className="order-btn outline" onClick={() => toast.success('Items re-added to your bag')}>Reorder</button>
+                <button type="button" className="order-btn outline" onClick={() => toast.info('Downloading invoice…')}>Invoice</button>
+              </>
+            )}
+            {order.status === 'Shipped' && (
+              <>
+                <button type="button" className="order-btn primary" onClick={() => toast.info('Opening tracking…')}>Track Order</button>
+                <button type="button" className="order-btn outline" onClick={() => toast.info('Cancellation requested')}>Cancel</button>
+              </>
+            )}
+            {order.status === 'Processing' && (
+              <button type="button" className="order-btn outline" onClick={() => toast.info('Order cancelled')}>Cancel Order</button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

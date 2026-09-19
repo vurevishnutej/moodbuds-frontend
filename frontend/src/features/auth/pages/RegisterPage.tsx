@@ -108,8 +108,7 @@ export function RegisterPage() {
         formData.email,
         formData.password,
         formData.firstName,
-        formData.lastName,
-        formData.mobile.replace(/[\s()-]/g, '') || undefined
+        formData.lastName
       );
       toast.success('Account created successfully!');
       navigate('/');

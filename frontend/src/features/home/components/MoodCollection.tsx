@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
-import { useMoods } from '../../moods/hooks/useMoods';
-import { moodBannerUrl, useFallbackMoodImage } from '../../moods/utils/moodBanner';
+import { MOODS } from '../../../data/moods';
 
 export function MoodCollection() {
-  const { moods } = useMoods();
   return (
     <div className="section">
       <div className="sec-head">
@@ -14,15 +12,10 @@ export function MoodCollection() {
         <a className="sec-see" href="#pill-strip">See All →</a>
       </div>
       <div className="mood-row" id="mood-cards-row">
-        {moods.map((m) => (
+        {MOODS.map((m) => (
           <Link key={m.id} className="mood-card" to={`/mood/${m.id}`}>
             <div className="mood-card-wrap">
-              <img
-                src={moodBannerUrl(m.id)}
-                alt={m.title}
-                loading="lazy"
-                onError={(event) => m.image ? useFallbackMoodImage(event, m.image.replace('w=1400', 'w=400')) : event.currentTarget.remove()}
-              />
+              <img src={m.image.replace('w=1400', 'w=400')} alt={m.title} loading="lazy" />
               <div className="mood-card-shade" />
               <div className="mood-card-info">
                 <div className="mood-card-name">{m.title}</div>

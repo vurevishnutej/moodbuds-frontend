@@ -12,7 +12,14 @@ export function CartItemRow({ item, onQtyChange, onRemove, onMoveToWishlist }: C
   return (
     <div className="cart-item-row">
       <div className="cart-item-img">
-        <img src={item.image} alt={item.name} loading="lazy" />
+        <img
+          src={item.image || '/placeholder-product.jpg'}
+          alt={item.name}
+          loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/placeholder-product.jpg';
+          }}
+        />
       </div>
       <div>
         <div className="cart-item-brand">{item.brand}</div>

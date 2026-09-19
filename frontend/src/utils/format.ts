@@ -1,4 +1,5 @@
-export function formatINR(n: number): string {
+export function formatINR(n: number | undefined | null): string {
+  if (n === null || n === undefined || isNaN(n)) return '₹0';
   return '₹' + Math.round(n).toLocaleString('en-IN');
 }
 

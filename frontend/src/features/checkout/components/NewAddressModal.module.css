@@ -1,0 +1,298 @@
+/* Address Modal Overlay */
+.amOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(15, 15, 18, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Modal Container */
+.amModal {
+  background: #fff;
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  animation: amIn 0.22s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+@keyframes amIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Header */
+.amHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.amTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.amClose {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  transition: color 0.16s;
+}
+
+.amClose:hover {
+  color: #000;
+}
+
+/* Scroll Container */
+.amScroll {
+  overflow-y: auto;
+  padding: 0;
+  flex: 1;
+}
+
+/* Map Section */
+.amMapWrap {
+  position: relative;
+  height: 230px;
+  background: #eef0f2;
+}
+
+.amMapFallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #9aa0a8;
+  font-size: 12px;
+  text-align: center;
+  padding: 20px;
+}
+
+.amLocbtn {
+  position: absolute;
+  z-index: 500;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f0f0f;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+
+.amLocbtn:hover {
+  background: #f6f6f6;
+}
+
+/* Location Note */
+.amLocNote {
+  font-size: 11px;
+  color: #999;
+  padding: 9px 24px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Form */
+.amForm {
+  padding: 20px 24px 4px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.amField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.amFieldFull {
+  grid-column: 1 / -1;
+}
+
+.amLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.amOpt {
+  color: #c4c4c4;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.amInput {
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  color: #0f0f0f;
+  border: 1.5px solid #e2e2e2;
+  padding: 11px 12px;
+  background: #fff;
+  transition: border-color 0.16s;
+  width: 100%;
+}
+
+.amInput:focus {
+  outline: none;
+  border-color: #0f0f0f;
+}
+
+.amInput.amErr {
+  border-color: #d0021b;
+}
+
+.amErrMsg {
+  font-size: 10.5px;
+  color: #d0021b;
+  display: none;
+}
+
+.amInput.amErr ~ .amErrMsg {
+  display: block;
+}
+
+/* Address Type Buttons */
+.amTypes {
+  display: flex;
+  gap: 8px;
+}
+
+.amType {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid #e2e2e2;
+  background: #fff;
+  color: #666;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: all 0.16s;
+}
+
+.amType:hover {
+  border-color: #0f0f0f;
+  color: #0f0f0f;
+}
+
+.amTypeActive {
+  border-color: #0f0f0f;
+  background: #0f0f0f;
+  color: #fff;
+}
+
+/* Checkbox */
+.amCheck {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: #444;
+  cursor: pointer;
+  padding: 2px 0 6px;
+}
+
+.amCheck input {
+  width: 16px;
+  height: 16px;
+  accent-color: #0f0f0f;
+  cursor: pointer;
+}
+
+/* Footer */
+.amFoot {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.amBtn {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+  border: none;
+}
+
+.amBtnGhost {
+  background: none;
+  border: 1.5px solid #d8d8d8;
+  color: #555;
+}
+
+.amBtnGhost:hover {
+  border-color: #0f0f0f;
+  color: #0f0f0f;
+}
+
+.amBtnSolid {
+  background: #0f0f0f;
+  border: 1.5px solid #0f0f0f;
+  color: #fff;
+}
+
+.amBtnSolid:hover {
+  background: #2a2a2a;
+  border-color: #2a2a2a;
+}
+
+/* Responsive */
+@media (max-width: 820px) {
+  .amForm {
+    grid-template-columns: 1fr;
+  }
+
+  .amModal {
+    max-height: 96vh;
+  }
+}

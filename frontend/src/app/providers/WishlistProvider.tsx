@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { WishlistItem, Product } from '../../types';
 import { wishlistService } from '../../features/wishlist/services/wishlistService';
 import { useToast } from './ToastProvider';
-import { useAuth } from './AuthProvider';
 
 interface WishlistContextValue {
   items: WishlistItem[];
@@ -18,13 +17,15 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-  const { isAuthenticated, customer } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) { setItems([]); setLoading(false); return; }
     setLoading(true);
-    wishlistService.getWishlist().then(setItems).catch(() => setItems([])).finally(() => setLoading(false));
-  }, [isAuthenticated, customer?.id]);
+    wishlistService
+      .getWishlist()
+      .then(setItems)
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const isWishlisted = useCallback(
     (productId: string) => items.some((i) => i.productId === productId),
@@ -33,7 +34,6 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   const toggleWishlist = useCallback(
     async (product: Product) => {
-      if (!isAuthenticated) { toast.info('Please sign in to save items'); return; }
       const existing = items.find((i) => i.productId === product.id);
       if (existing) {
         const next = await wishlistService.removeFromWishlist(existing.id);
@@ -45,7 +45,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         toast.success('Saved to wishlist');
       }
     },
-    [isAuthenticated, items, toast]
+    [items, toast]
   );
 
   const removeItem = useCallback(async (itemId: string) => {

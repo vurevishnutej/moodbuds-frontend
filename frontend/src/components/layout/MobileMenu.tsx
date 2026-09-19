@@ -1,12 +1,10 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { useMoods } from '../../features/moods/hooks/useMoods';
-import { moodBannerBackground } from '../../features/moods/utils/moodBanner';
+import { MOODS } from '../../data/moods';
 import { useCart } from '../../app/providers/CartProvider';
 import { useWishlist } from '../../app/providers/WishlistProvider';
 import { useQuizModal } from '../../app/providers/QuizProvider';
-import { useAuth } from '../../app/providers/AuthProvider';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -18,9 +16,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { items: wishlistItems } = useWishlist();
   const quiz = useQuizModal();
   const cartCount = cart.items.reduce((s, i) => s + i.qty, 0);
-  const { moods } = useMoods();
-  const bannerMood = moods.find((m) => m.id === 'party') ?? moods[0];
-  const { isAuthenticated, customer, logout } = useAuth();
+  const bannerMood = MOODS.find((m) => m.id === 'party') ?? MOODS[0];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -46,7 +42,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       <div className="mmb-drawer" role="dialog" aria-modal="true" aria-label="Menu">
         <div
           className="mmb-drawer-banner"
-          style={{ backgroundImage: bannerMood ? moodBannerBackground(bannerMood) : undefined }}
+          style={{ backgroundImage: `url(${bannerMood.image.replace('w=1400', 'w=700')})` }}
         >
           <span className="mmb-drawer-banner-ribbon">₹300 OFF</span>
           <button type="button" className="mmb-drawer-close" aria-label="Close menu" onClick={onClose}>
@@ -63,7 +59,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <Link to="/" className="mmb-drawer-link" onClick={onClose}>
           Home <span className="chev">›</span>
         </Link>
-        <Link to={moods[0] ? `/mood/${moods[0].id}` : '/'} className="mmb-drawer-link" onClick={onClose}>
+        <Link to="/mood/happy" className="mmb-drawer-link" onClick={onClose}>
           Shop by Mood <span className="chev">›</span>
         </Link>
         <Link to="/wishlist" className="mmb-drawer-link" onClick={onClose}>
@@ -83,8 +79,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         <div className="mmb-drawer-divider" />
 
-        {isAuthenticated ? <>
-        <div className="mmb-drawer-link"><strong>{customer?.firstName} {customer?.lastName}</strong></div>
         <Link to="/profile" className="mmb-drawer-link" onClick={onClose}>
           My Profile <span className="chev">›</span>
         </Link>
@@ -97,11 +91,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <Link to="/profile/addresses" className="mmb-drawer-link" onClick={onClose}>
           Addresses <span className="chev">›</span>
         </Link>
-        <button type="button" className="mmb-drawer-link" onClick={() => { void logout(); onClose(); }}>Sign Out <span className="chev">›</span></button>
-        </> : <>
-          <Link to="/login" className="mmb-drawer-link" onClick={onClose}>Sign In <span className="chev">›</span></Link>
-          <Link to="/register" className="mmb-drawer-link" onClick={onClose}>Create Account <span className="chev">›</span></Link>
-        </>}
 
         <div className="mmb-drawer-divider" />
 
@@ -119,10 +108,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <span className="chev">›</span>
           </span>
         </button>
-        <Link to="/admin" className="mmb-drawer-link" onClick={onClose}>
-          Admin <span className="chev">›</span>
+        <Link to="/profile/admin" className="mmb-drawer-link" onClick={onClose}>
+          Admin Panel <span className="chev">›</span>
         </Link>
-        <Link to="/contact-us" className="mmb-drawer-link" onClick={onClose}>
+        <Link to="/profile/contact" className="mmb-drawer-link" onClick={onClose}>
           Contact Us <span className="chev">›</span>
         </Link>
       </div>

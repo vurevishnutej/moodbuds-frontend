@@ -3,7 +3,7 @@ import { useAuth } from '../../../app/providers/AuthProvider';
 import { useToast } from '../../../app/providers/ToastProvider';
 
 export function ProfileInfoPage() {
-  const { customer, updateProfile } = useAuth();
+  const { customer } = useAuth();
   const toast = useToast();
 
   const [form, setForm] = useState({
@@ -22,23 +22,16 @@ export function ProfileInfoPage() {
         firstName: customer.firstName || '',
         lastName: customer.lastName || '',
         email: customer.email || '',
-        phone: customer.mobile || '',
-        dob: customer.dateOfBirth || '',
-        gender: customer.gender || 'UNSPECIFIED',
+        phone: '',
+        dob: '',
+        gender: 'Prefer not to say',
       });
     }
   }, [customer]);
 
-  const [saving, setSaving] = useState(false);
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    try {
-      await updateProfile({ firstName: form.firstName.trim(), lastName: form.lastName.trim(), mobile: form.phone.trim() || null, dateOfBirth: form.dob || null, gender: form.gender as 'M' | 'F' | 'OTHER' | 'UNSPECIFIED' });
-      toast.success('Profile updated');
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : 'Could not update profile');
-    } finally { setSaving(false); }
+    toast.success('Profile updated');
   };
 
   return (
@@ -62,7 +55,7 @@ export function ProfileInfoPage() {
           </div>
           <div className="prof-field">
             <label>Email Address</label>
-            <input type="email" value={form.email} readOnly />
+            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
           <div className="prof-form-row">
             <div className="prof-field">
@@ -77,13 +70,13 @@ export function ProfileInfoPage() {
           <div className="prof-field">
             <label>Gender</label>
             <select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })}>
-              <option value="UNSPECIFIED">Prefer not to say</option>
-              <option value="M">Male</option>
-              <option value="F">Female</option>
-              <option value="OTHER">Other</option>
+              <option>Prefer not to say</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Non-binary</option>
             </select>
           </div>
-          <button className="prof-save-btn" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save Changes'}</button>
+          <button className="prof-save-btn" type="submit">Save Changes</button>
         </form>
       </div>
     </div>

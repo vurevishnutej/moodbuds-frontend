@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMoods } from '../../moods/hooks/useMoods';
+import { MOODS } from '../../../data/moods';
 import { capitalize } from '../../../utils/format';
-import { moodBannerUrl, useFallbackMoodImage } from '../../moods/utils/moodBanner';
 
 const AUTOPLAY_MS = 5500;
 const SLIDE_TAGLINES = [
@@ -23,31 +22,23 @@ export function HeroSlider() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartX = useRef(0);
   const navigate = useNavigate();
-  const { moods, loading, error, refresh } = useMoods();
 
   const goTo = useCallback((n: number) => {
-    if (moods.length) setCurrent((n + moods.length) % moods.length);
-  }, [moods.length]);
+    setCurrent((n + MOODS.length) % MOODS.length);
+  }, []);
 
   useEffect(() => {
-    if (paused || moods.length < 2) {
+    if (paused) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
     timerRef.current = setInterval(() => {
-      setCurrent((c) => (c + 1) % moods.length);
+      setCurrent((c) => (c + 1) % MOODS.length);
     }, AUTOPLAY_MS);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [paused, moods.length]);
-
-  useEffect(() => {
-    if (current >= moods.length) setCurrent(0);
-  }, [current, moods.length]);
-
-  if (loading && moods.length === 0) return <div id="hero" className="mood-catalog-state">Choosing today&apos;s moods…</div>;
-  if (error && moods.length === 0) return <div id="hero" className="mood-catalog-state"><span>{error}</span><button type="button" onClick={() => void refresh()}>Try again</button></div>;
+  }, [paused]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -68,21 +59,16 @@ export function HeroSlider() {
       onTouchEnd={onTouchEnd}
     >
       <div id="slides">
-        {moods.map((m, i) => (
+        {MOODS.map((m, i) => (
           <div
             key={m.id}
             className={`slide${i === current ? ' active' : ''}`}
             onClick={() => navigate(`/mood/${m.id}`)}
           >
-            <img
-              src={moodBannerUrl(m.id)}
-              alt={m.title}
-              loading={i === 0 ? 'eager' : 'lazy'}
-              onError={(event) => m.image ? useFallbackMoodImage(event, m.image) : event.currentTarget.remove()}
-            />
+            <img src={m.image} alt={m.title} loading={i === 0 ? 'eager' : 'lazy'} />
             <div className="slide-grade" style={{ background: m.gradeOverlay }} />
             <div className="slide-content">
-              <span className="slide-eyebrow">{SLIDE_TAGLINES[i % SLIDE_TAGLINES.length]}</span>
+              <span className="slide-eyebrow">{SLIDE_TAGLINES[i]}</span>
               <div className="slide-title">
                 {capitalize(m.title)}
                 <em>{m.subtitle}</em>
@@ -122,7 +108,7 @@ export function HeroSlider() {
         &#8594;
       </button>
       <div id="slider-dots">
-        {moods.map((m, i) => (
+        {MOODS.map((m, i) => (
           <button
             key={m.id}
             type="button"

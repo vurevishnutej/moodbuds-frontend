@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 export function MobileFooter() {
   return (
     <footer className="mmb-footer">
@@ -40,13 +38,13 @@ export function MobileFooter() {
           <a href="#">Sizing Guide</a>
           <a href="#">Track My Order</a>
           <a href="#">Returns &amp; Exchanges</a>
-          <Link to="/contact-us">Contact Us</Link>
+          <a href="#">Contact Us</a>
         </div>
       </details>
       <details className="mmb-footer-accordion">
         <summary>Company</summary>
         <div className="mmb-footer-acc-links">
-          <Link to="/about-us">About MoodBuds</Link>
+          <a href="#">About MoodBuds</a>
           <a href="#">Careers</a>
           <a href="#">Blog</a>
         </div>
