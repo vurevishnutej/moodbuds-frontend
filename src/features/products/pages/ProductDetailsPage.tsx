@@ -57,12 +57,196 @@ export function ProductDetailsPage() {
 
   return (
     <div id="view-product" className="mb-page-fade">
-      <div className="mb-mobile-shell">
+<div className="mb-mobile-shell">
         <MobileNavbar />
-        <div style={{ padding: '16px' }}>
-          {/* Mobile product details would go here */}
-          <h1 style={{ fontSize: '18px', marginBottom: '8px' }}>{product.name}</h1>
-          <p style={{ fontSize: '14px', color: '#666' }}>{product.brand}</p>
+        <div style={{ paddingBottom: '16px' }}>
+          {/* Product Image */}
+          {product.image && (
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+          )}
+
+          <div style={{ padding: '16px' }}>
+            {/* Brand and Name */}
+            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+              {product.brand}
+            </div>
+            <h1 style={{ fontSize: '18px', fontWeight: 400, marginBottom: '8px', lineHeight: 1.2, fontFamily: "'Playfair Display',serif" }}>
+              {product.name}
+            </h1>
+
+            {/* Price */}
+            <div style={{ marginBottom: '12px' }}>
+              <span style={{ fontSize: '18px', fontWeight: 700, color: '#000', marginRight: '8px' }}>
+                {formatINR(product.price)}
+              </span>
+              {product.originalPrice && (
+                <span style={{ fontSize: '14px', color: '#999', textDecoration: 'line-through', marginRight: '8px' }}>
+                  {formatINR(product.originalPrice)}
+                </span>
+              )}
+              {product.originalPrice && (
+                <span style={{ fontSize: '12px', color: '#8b3a52', fontWeight: 600 }}>
+                  {Math.round((1 - product.price / product.originalPrice) * 100)}% off
+                </span>
+              )}
+            </div>
+
+            {/* Rating */}
+            {product.rating > 0 && (
+              <div style={{ marginBottom: '16px', fontSize: '13px' }}>
+                <span style={{ color: '#ffc107', marginRight: '4px' }}>
+                  {'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}
+                </span>
+                <span style={{ color: '#666' }}>({product.reviewCount} reviews)</span>
+              </div>
+            )}
+
+            {/* Colors */}
+            {product.colors.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '8px' }}>
+                  Colour — {product.colors[colorIdx].name}
+                </label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {product.colors.map((c, i) => (
+                    <button
+                      key={c.name}
+                      type="button"
+                      onClick={() => setColorIdx(i)}
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '4px',
+                        background: c.hex,
+                        border: i === colorIdx ? '2px solid #8b3a52' : '1px solid #ddd',
+                        cursor: 'pointer',
+                      }}
+                      aria-label={c.name}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sizes */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '8px' }}>
+                Size
+              </label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {product.sizes.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSize(s)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '4px',
+                      background: selectedSize === s ? '#8b3a52' : '#fff',
+                      color: selectedSize === s ? '#fff' : '#111',
+                      border: selectedSize === s ? 'none' : '1px solid #ddd',
+                      cursor: 'pointer',
+                      fontWeight: 500,
+                      fontSize: '13px',
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity */}
+            <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase' }}>Qty</label>
+              <div style={{ display: 'flex', border: '1px solid #e0e0e0', borderRadius: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    border: 'none',
+                    background: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                  }}
+                >
+                  −
+                </button>
+                <div style={{ width: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 500 }}>
+                  {qty}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => q + 1)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    border: 'none',
+                    background: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                  }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Add to Cart Button */}
+            <button
+              type="button"
+              onClick={() => void handleAddToCart()}
+              disabled={adding || !selectedSize}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#8b3a52',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 700,
+                fontSize: '13px',
+                letterSpacing: '0.04em',
+                cursor: 'pointer',
+                marginBottom: '8px',
+                opacity: adding || !selectedSize ? 0.5 : 1,
+              }}
+            >
+              {adding ? 'Adding…' : alreadyInBag ? 'Go to bag' : 'Add to bag'}
+            </button>
+
+            {/* Wishlist Button */}
+            <button
+              type="button"
+              onClick={() => toggleWishlist(product)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#fff',
+                color: '#8b3a52',
+                border: '1.5px solid #8b3a52',
+                borderRadius: '4px',
+                fontWeight: 700,
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              {wishlisted ? '♥ Saved' : '♡ Save to wishlist'}
+            </button>
+
+            {/* Delivery Info */}
+            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0', fontSize: '12px', color: '#666' }}>
+              <div style={{ marginBottom: '8px' }}>🚚 Free delivery on orders above ₹999</div>
+              <div style={{ marginBottom: '8px' }}>↩ 30-day hassle-free returns</div>
+              <div>🔒 Secure checkout</div>
+            </div>
+          </div>
         </div>
         <MobileFooter />
       </div>
