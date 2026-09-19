@@ -1,16 +1,20 @@
 import { useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { ListingHeader } from '../../../components/layout/ListingHeader';
 import { Footer } from '../../../components/layout/Footer';
 import { LoadingState, ErrorState } from '../../../components/common/States';
 import { useMood } from '../../moods/hooks/useMoods';
 import { MOOD_MATERIAL } from '../../../data/moodPalette';
 import { useMoodPalette } from '../../moods/hooks/useMoodPalette';
-import { moodBannerUrl, useFallbackMoodImage } from '../../moods/utils/moodBanner';
 import { useBodyViewClass } from '../../../hooks/useBodyViewClass';
 import { useProducts } from '../hooks/useProducts';
 import { ProductGrid } from '../components/ProductGrid';
-import { FilterSidebar, type ListingFilters } from '../components/FilterSidebar';
+import {
+  FilterSidebar,
+  PRICE_RANGES,
+  type ListingFilters,
+  type PriceRangeId,
+} from '../components/FilterSidebar';
 import { ListingToolbar } from '../components/ListingToolbar';
 import { capitalize } from '../../../utils/format';
 import type { MoodId, ProductQuery } from '../../../types';
@@ -18,21 +22,61 @@ import type { MoodId, ProductQuery } from '../../../types';
 export function ProductListingPage() {
   useBodyViewClass('listing');
   const { moodId } = useParams<{ moodId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { mood, loading: moodLoading, error: moodError } = useMood(moodId);
-  const [sort, setSort] = useState<NonNullable<ProductQuery['sort']>>('new');
   const [columns, setColumns] = useState<2 | 3 | 4>(4);
-  const [filters, setFilters] = useState<ListingFilters>({ onSale: false, isNew: false, sizes: [] });
+
+  const sortValue = searchParams.get('sort');
+  const sort: NonNullable<ProductQuery['sort']> =
+    sortValue === 'featured' || sortValue === 'price-asc' || sortValue === 'price-desc' ? sortValue : 'new';
+  const priceValue = searchParams.get('price');
+  const priceRange = PRICE_RANGES.some((range) => range.id === priceValue)
+    ? priceValue as PriceRangeId
+    : null;
+  const filters: ListingFilters = useMemo(() => ({
+    category: searchParams.get('category'),
+    subcategory: searchParams.get('subcategory'),
+    priceRange,
+    sizes: (searchParams.get('sizes') ?? '').split(',').map((size) => size.trim()).filter(Boolean),
+    isNew: searchParams.get('new') === 'true',
+    onSale: searchParams.get('sale') === 'true',
+  }), [priceRange, searchParams]);
+
+  const setFilters = (nextFilters: ListingFilters) => {
+    const next = new URLSearchParams(searchParams);
+    const setOrDelete = (key: string, value: string | null) => value ? next.set(key, value) : next.delete(key);
+    setOrDelete('category', nextFilters.category);
+    setOrDelete('subcategory', nextFilters.subcategory);
+    setOrDelete('price', nextFilters.priceRange);
+    setOrDelete('sizes', nextFilters.sizes.length ? nextFilters.sizes.join(',') : null);
+    setOrDelete('new', nextFilters.isNew ? 'true' : null);
+    setOrDelete('sale', nextFilters.onSale ? 'true' : null);
+    setSearchParams(next);
+  };
+
+  const setSort = (nextSort: NonNullable<ProductQuery['sort']>) => {
+    const next = new URLSearchParams(searchParams);
+    if (nextSort === 'new') next.delete('sort');
+    else next.set('sort', nextSort);
+    setSearchParams(next);
+  };
 
   useMoodPalette(mood?.id);
 
-  const query: ProductQuery = useMemo(
-    () => ({
+  const query: ProductQuery = useMemo(() => {
+    const selectedPrice = PRICE_RANGES.find((range) => range.id === filters.priceRange);
+    return {
       moodId: mood?.id,
       sort,
+      category: filters.category || undefined,
+      subcategory: filters.subcategory || undefined,
       onSale: filters.onSale || undefined,
       isNew: filters.isNew || undefined,
       sizes: filters.sizes.length ? filters.sizes : undefined,
-    }),
+      minPrice: selectedPrice?.minPrice,
+      maxPrice: selectedPrice?.maxPrice,
+    };
+  },
     [mood?.id, sort, filters]
   );
 
@@ -59,13 +103,15 @@ export function ProductListingPage() {
         <ListingHeader activeMoodId={mood.id} />
 
         <div id="listing-hero">
-          <img
-            id="listing-hero-img"
-            src={moodBannerUrl(mood.id)}
-            alt={mood.title}
-            loading="eager"
-            onError={(event) => mood.image ? useFallbackMoodImage(event, mood.image) : event.currentTarget.remove()}
-          />
+          {mood.image && (
+            <img
+              id="listing-hero-img"
+              src={mood.image}
+              alt={mood.title}
+              loading="eager"
+              onError={(event) => event.currentTarget.remove()}
+            />
+          )}
           <div id="listing-hero-overlay" />
           <div id="listing-hero-content">
             <span id="listing-hero-kicker">Mood Edit · {capitalize(mood.id)}</span>

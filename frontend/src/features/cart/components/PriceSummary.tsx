@@ -139,7 +139,6 @@ export function PriceSummary({ cart, onApplyPromo, onRemovePromo, onCheckout, ch
       <button type="button" className="cart-checkout-btn" onClick={onCheckout} disabled={checkingOut}>
         {checkingOut ? 'Placing order…' : 'Proceed to checkout'}
       </button>
-      <button type="button" className="cart-save-btn">Save bag for later</button>
 
       <div className="cart-trust">
         <div className="cart-trust-row">

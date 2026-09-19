@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../../../types';
 import { formatINR } from '../../../utils/format';
@@ -14,6 +15,18 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
   const navigate = useNavigate();
   const { isWishlisted, toggleWishlist } = useWishlist();
   const wishlisted = isWishlisted(product.id);
+  const [imageState, setImageState] = useState<{
+    source: string;
+    status: 'loading' | 'loaded' | 'failed';
+  }>(() => ({
+    source: product.image,
+    status: product.image ? 'loading' : 'failed',
+  }));
+  const imageStatus = imageState.source === product.image
+    ? imageState.status
+    : product.image ? 'loading' : 'failed';
+  const imageLoaded = imageStatus === 'loaded';
+  const imageFailed = imageStatus === 'failed';
 
   const discountPct = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
@@ -25,7 +38,8 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
       style={{ cursor: 'pointer' }}
       onClick={() => navigate(`/product/${product.id}`)}
     >
-      <div className="product-media">
+      <div className={`product-media${imageLoaded ? ' img-loaded' : ''}${imageFailed ? ' img-error' : ''}`}>
+        {!imageLoaded && !imageFailed && <div className="media-skeleton" aria-hidden="true" />}
         <span className="product-label">{materialLabel}</span>
         {product.badge && (
           <div className="product-badges">
@@ -45,12 +59,17 @@ export function ProductCard({ product, materialLabel, priority }: ProductCardPro
             <HeartIcon size={15} filled={wishlisted} />
           </button>
         </div>
-        <img
-          src={product.image}
-          alt={product.name}
-          loading={priority ? 'eager' : 'lazy'}
-          decoding="async"
-        />
+        {!imageFailed && (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            onLoad={() => setImageState({ source: product.image, status: 'loaded' })}
+            onError={() => setImageState({ source: product.image, status: 'failed' })}
+          />
+        )}
+        {imageFailed && <div className="product-image-unavailable">Image unavailable</div>}
         <div className="product-cart-bar">View product</div>
       </div>
       <div className="product-info">

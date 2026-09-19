@@ -9,14 +9,56 @@ export interface AdminMood {
 }
 
 export interface AdminProduct {
+  id?: number;
   sku: string;
   name: string;
   brand: string;
   mood: string;
   price: number;
   stock: number;
-  status: 'Active' | 'Out of stock' | 'Low stock';
+  status: 'Active' | 'Out of stock' | 'Low stock' | 'Draft';
   image: string;
+  mrp?: number;
+  description?: string;
+  category?: string;
+  subcategory?: string;
+  sizes?: string[];
+  sizeStocks?: Array<{ size: string; stockQuantity: number; lowStockThreshold: number; available: boolean }>;
+  images?: Array<{ mediaId: number | null; productImageId?: number; url: string }>;
+  categoryId?: number | string;
+  subcategoryId?: number | string;
+  gstRateId?: number | string;
+  colorName?: string;
+  moodIds?: (number | string)[];
+  returnWindowDays?: number;
+  featured?: boolean;
+  newArrival?: boolean;
+  bestSeller?: boolean;
+}
+
+export interface AdminCategory {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  products: number;
+  subcategoryCount: number;
+  status: 'Active' | 'Draft';
+}
+
+export interface AdminSubcategory {
+  id: string;
+  parentId: string;
+  parent: string;
+  name: string;
+  slug: string;
+  image: string;
+  products: number;
+  status: 'Active' | 'Draft';
+}
+
+export function slugify(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 export interface AdminOrder {
@@ -51,19 +93,6 @@ const THUMB_IMAGES = [
 export function adminThumb(i: number): string {
   return THUMB_IMAGES[i % THUMB_IMAGES.length];
 }
-
-export const ADMIN_PRODUCTS: AdminProduct[] = [
-  { sku: 'MB-BLZ-001', name: 'Structured Blazer', brand: 'The Boardroom', mood: 'professional', price: 3499, stock: 24, status: 'Active', image: THUMB_IMAGES[0] },
-  { sku: 'MB-DRS-014', name: 'Satin Slip Dress', brand: 'Blush House', mood: 'romantic', price: 2499, stock: 8, status: 'Active', image: THUMB_IMAGES[1] },
-  { sku: 'MB-SHT-022', name: 'Oversized Linen Shirt', brand: 'Still Water', mood: 'calm', price: 1499, stock: 0, status: 'Out of stock', image: THUMB_IMAGES[2] },
-  { sku: 'MB-TRN-007', name: 'Clean Line Trench', brand: 'Form Zero', mood: 'minimal', price: 4299, stock: 15, status: 'Active', image: THUMB_IMAGES[3] },
-  { sku: 'MB-SEQ-031', name: 'Sequin Mini Dress', brand: 'After Dark', mood: 'party', price: 2999, stock: 31, status: 'Active', image: THUMB_IMAGES[4] },
-  { sku: 'MB-SHO-045', name: 'Cushioned Running Shoes', brand: 'Stride Co.', mood: 'energetic', price: 2999, stock: 5, status: 'Low stock', image: THUMB_IMAGES[5] },
-  { sku: 'MB-COT-009', name: 'Power Shoulder Coat', brand: 'Power Dressing', mood: 'confident', price: 5299, stock: 12, status: 'Active', image: THUMB_IMAGES[6] },
-  { sku: 'MB-TEE-052', name: 'Sunshine Knit Tee', brand: 'Sunshine Edit', mood: 'happy', price: 999, stock: 64, status: 'Active', image: THUMB_IMAGES[7] },
-  { sku: 'MB-JKT-018', name: 'Faded Denim Jacket', brand: 'Ice Edit', mood: 'cool', price: 2799, stock: 19, status: 'Active', image: THUMB_IMAGES[0] },
-  { sku: 'MB-EAR-061', name: 'Pearl Detail Earrings', brand: 'Tender Things', mood: 'romantic', price: 799, stock: 2, status: 'Low stock', image: THUMB_IMAGES[1] },
-];
 
 export const ADMIN_ORDERS: AdminOrder[] = [
   { id: 'MBD-100482', customer: 'Gautham', date: '28 Jun 2026', items: 3, total: 7997, payment: 'Paid', status: 'New', mood: 'professional' },

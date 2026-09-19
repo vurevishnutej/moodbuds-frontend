@@ -123,6 +123,8 @@ export const apiClient = {
   get: <T>(path: string, options?: ApiRequestOptions) => request<T>(path, undefined, options),
   post: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }, options),
+  postForm: <T>(path: string, body: FormData, options?: ApiRequestOptions) =>
+    request<T>(path, { method: 'POST', body }, options),
   putForm: <T>(path: string, body: FormData, options?: ApiRequestOptions) =>
     request<T>(path, { method: 'PUT', body }, options),
   put: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>

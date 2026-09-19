@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useMoods } from '../../moods/hooks/useMoods';
-import { PRODUCTS } from '../../../data/products';
 import { capitalize } from '../../../utils/format';
 import { useQuizModal } from '../../../app/providers/QuizProvider';
 import { MobileProductCarousel } from './MobileProductCarousel';
 import { moodBannerBackground } from '../../moods/utils/moodBanner';
 import { useHomepageCoupon } from '../../coupons/hooks/useHomepageCoupon';
 import { couponOffer } from '../../coupons/services/couponService';
+import { useProducts } from '../../products/hooks/useProducts';
 
 const QUIZ_FIELD_EMOJIS = ['💫', '✨', '🌙', '💖', '⚡', '🌈', '🌹', '🦋', '👑', '🎵', '☁️', '🌟', '💝', '🎀', '🔥', '😊'];
 
@@ -35,14 +35,16 @@ export function MobileHome() {
   const { moods } = useMoods();
   const homepageCoupon = useHomepageCoupon();
   const heroMoods = moods.slice(0, 5);
+  const { products: newArrivalProducts } = useProducts({ isNew: true, sort: 'new' });
+  const { products: featuredProducts } = useProducts({ sort: 'featured' });
 
   const newArrivals = useMemo(
-    () => PRODUCTS.filter((p) => p.badge === 'New').slice(0, 10),
-    []
+    () => newArrivalProducts.slice(0, 10),
+    [newArrivalProducts]
   );
   const trending = useMemo(
-    () => [...PRODUCTS].sort((a, b) => b.rating - a.rating).slice(0, 10),
-    []
+    () => featuredProducts.slice(0, 10),
+    [featuredProducts]
   );
 
   return (

@@ -44,6 +44,8 @@ export interface Product {
 export interface ProductQuery {
   moodId?: MoodId;
   search?: string;
+  category?: string;
+  subcategory?: string;
   onSale?: boolean;
   isNew?: boolean;
   minPrice?: number;

@@ -56,9 +56,8 @@ function mapDetail(item: ProductDetailResponse): Product {
   };
 }
 
-function mapPage(response: PageResponse<ProductCardResponse>, moodId?: MoodId, onSale?: boolean) {
-  const products = response.content.map((item) => mapCard(item, moodId));
-  return onSale ? products.filter((product) => product.badge === 'Sale') : products;
+function mapPage(response: PageResponse<ProductCardResponse>, moodId?: MoodId) {
+  return response.content.map((item) => mapCard(item, moodId));
 }
 
 export const httpProductApi: ProductApi = {
@@ -66,15 +65,18 @@ export const httpProductApi: ProductApi = {
     const params = new URLSearchParams();
     if (query?.search) params.set('q', query.search);
     if (query?.moodId) params.set('mood', query.moodId);
+    if (query?.category) params.set('category', query.category);
+    if (query?.subcategory) params.set('subcategory', query.subcategory);
     if (query?.sort) params.set('sort', sortForBackend(query.sort) || 'newest');
     if (query?.isNew) params.set('newArrival', 'true');
-    if (query?.sizes?.[0]) params.set('productSize', query.sizes[0]);
+    if (query?.onSale) params.set('onSale', 'true');
+    if (query?.sizes?.length) params.set('productSize', query.sizes.join(','));
     if (query?.minPrice != null) params.set('minPrice', String(Math.round(query.minPrice * 100)));
     if (query?.maxPrice != null) params.set('maxPrice', String(Math.round(query.maxPrice * 100)));
     params.set('size', '100');
 
     const response = await apiClient.get<PageResponse<ProductCardResponse>>(`/products?${params.toString()}`);
-    return mapPage(response, query?.moodId, query?.onSale);
+    return mapPage(response, query?.moodId);
   },
 
   async getProductById(id: string) {

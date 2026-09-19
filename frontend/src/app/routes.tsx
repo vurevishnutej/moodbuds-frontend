@@ -20,6 +20,7 @@ import { AdminLayout, AdminHub } from '../features/admin/pages/AdminLayout';
 import { AdminLoginPage } from '../features/admin/pages/AdminLoginPage';
 import { AdminRoute, AdminGuestRoute, CustomerRoute, GuestRoute } from './RouteGuards';
 import { EditProductsPage } from '../features/admin/pages/EditProductsPage';
+import { EditProductPage } from '../features/admin/pages/EditProductPage';
 import { CreateProductPage } from '../features/admin/pages/CreateProductPage';
 import { OrderListPage } from '../features/admin/pages/OrderListPage';
 import { OrderDetailsPage } from '../features/admin/pages/OrderDetailsPage';
@@ -75,6 +76,7 @@ export function AppRoutes() {
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminHub />} />
           <Route path="edit-products" element={<EditProductsPage />} />
+          <Route path="edit-products/:id" element={<EditProductPage />} />
           <Route path="create-product" element={<CreateProductPage />} />
           <Route path="bulk-import-export" element={<BulkImportExportPage />} />
           <Route path="categories" element={<CategoriesPage />} />

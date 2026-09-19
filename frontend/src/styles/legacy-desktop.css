@@ -2125,6 +2125,40 @@ body.page-in #listing-page{
   align-items:start;
 }
 
+/* ── SEARCH RESULTS ── */
+.search-results-wrap{
+  max-width:1440px;margin:0 auto;
+  padding:clamp(34px,5vw,64px) clamp(20px,4vw,52px) 72px;
+}
+.search-results-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:28px;
+  margin-bottom:30px;padding-bottom:22px;border-bottom:1px solid var(--line);
+}
+.search-results-kicker{
+  display:block;margin-bottom:8px;
+  color:var(--muted);font-size:9px;font-weight:700;
+  letter-spacing:0.25em;text-transform:uppercase;
+}
+.search-results-head h1{
+  color:var(--ink);font:400 clamp(25px,3vw,38px)/1.15 'Playfair Display',serif;
+}
+.search-results-head h1 em{font-weight:400;color:var(--mood-accent);}
+.search-results-head p{margin-top:8px;color:var(--muted);font-size:12px;}
+.search-results-form{display:flex;min-width:min(100%,360px);}
+.search-results-form input{
+  width:100%;height:42px;padding:0 13px;
+  border:1px solid var(--line);border-right:0;background:var(--card);color:var(--ink);
+  font:400 12px 'Inter',sans-serif;outline:none;
+}
+.search-results-form input:focus{border-color:var(--ink);}
+.search-results-form button{
+  height:42px;padding:0 20px;border:1px solid var(--ink);
+  background:var(--ink);color:#fff;cursor:pointer;
+  font:600 10px 'Inter',sans-serif;letter-spacing:0.13em;text-transform:uppercase;
+}
+.search-results-form button:disabled{cursor:not-allowed;opacity:0.45;}
+.search-results-products{min-width:0;}
+
 /* ── LEFT SIDEBAR ── */
 .listing-sidebar{
   padding-top:4px;
@@ -2161,7 +2195,15 @@ body.page-in #listing-page{
   font-size:10px;font-weight:700;letter-spacing:0.18em;
   text-transform:uppercase;color:var(--muted);
   margin-bottom:12px;margin-top:20px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
+.sb-clear{
+  border:0;background:transparent;padding:0;color:var(--mood-accent);
+  font:600 10px 'Inter',sans-serif;letter-spacing:0;text-transform:none;cursor:pointer;
+}
+.sb-clear:hover{text-decoration:underline;}
+.sb-filter-note{font-size:10px;color:var(--muted);padding:5px 2px;}
+.sb-filter-error{font-size:10px;line-height:1.5;color:#b4494b;border-top:1px solid var(--line);padding-top:12px;}
 .sb-group{
   border-top:1px solid var(--line);
   padding:12px 0;
@@ -2297,6 +2339,11 @@ body.page-in #listing-page{
 }
 .product-media.img-loaded img{opacity:1;}
 .product-media.img-loaded .media-skeleton{opacity:0;pointer-events:none;}
+.product-image-unavailable{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:24px;text-align:center;color:var(--muted);font-size:11px;font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;
+}
 .product-card:hover .product-media img{transform:scale(1.04);}
 
 /* Material label — top left */
@@ -2464,6 +2511,9 @@ body.page-in #listing-page{
   #view-listing #products,#products.cols-3,#products.cols-4{grid-template-columns:repeat(2,1fr);}
   #view-listing #products.view-list .product-card{flex-direction:column;}
   #view-listing #products.view-list .product-media{width:100%;}
+  .search-results-wrap{padding:28px 16px 48px;}
+  .search-results-head{display:block;margin-bottom:20px;padding-bottom:18px;}
+  .search-results-form{min-width:0;margin-top:18px;}
 }
 
 
@@ -3182,6 +3232,59 @@ body.quiz-open{overflow:hidden;}
   .cms-about-grid article{min-height:0;padding:34px 26px;}
   .cms-contact-grid>a,.cms-contact-grid>article{min-height:190px;padding:28px;}
   .cms-contact-icon{margin-bottom:22px;}
+}
+
+/* Admin catalog modals, media picker, category cards and product actions */
+#panel-admin .adm-modal-overlay{position:fixed;inset:0;background:rgba(19,23,34,.44);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;animation:admFadeIn .15s ease;}
+#panel-admin .adm-modal{background:#fff;border-radius:14px;width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.28);animation:admPopIn .16s ease;}
+#panel-admin .adm-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px;border-bottom:1px solid #f0f0f0;}
+#panel-admin .adm-modal-title{font-size:16px;font-weight:800;color:#131722;letter-spacing:-.01em;}
+#panel-admin .adm-modal-sub{font-size:12px;color:#9a9a9a;margin-top:3px;}
+#panel-admin .adm-modal-x{width:30px;height:30px;flex-shrink:0;border:none;background:#f4f4f6;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#777;transition:all .15s;}
+#panel-admin .adm-modal-x:hover{background:#ececf0;color:#131722;}
+#panel-admin .adm-modal-x svg{width:14px;height:14px;}
+#panel-admin .adm-modal-body{padding:20px 22px;overflow-y:auto;}
+#panel-admin .adm-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid #f0f0f0;}
+#panel-admin .adm-modal-msg{font-size:13px;color:#555;line-height:1.6;}
+@keyframes admFadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes admPopIn{from{opacity:0;transform:translateY(6px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+#panel-admin .adm-img-strip{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+#panel-admin .adm-img-thumb{position:relative;width:78px;height:78px;border-radius:9px;overflow:hidden;background:#f0f0f2;flex-shrink:0;}
+#panel-admin .adm-img-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+#panel-admin .adm-img-remove{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:999px;border:none;background:rgba(19,23,34,.72);color:#fff;font-size:10px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+#panel-admin .adm-img-remove:hover{background:#ff3f6c;}
+#panel-admin .adm-img-primary{position:absolute;left:0;right:0;bottom:0;background:rgba(19,23,34,.78);color:#fff;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:2px 0;}
+
+#panel-admin .adm-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+#panel-admin .adm-cat-card{background:#fff;border:1px solid #ececec;border-radius:14px;overflow:hidden;transition:box-shadow .15s,border-color .15s;}
+#panel-admin .adm-cat-card:hover{box-shadow:0 8px 24px rgba(19,23,34,.08);border-color:#e2e2e2;}
+#panel-admin .adm-cat-media{position:relative;height:120px;background:linear-gradient(135deg,#eef0f5,#e3e6ee);}
+#panel-admin .adm-cat-media img{width:100%;height:100%;object-fit:cover;display:block;}
+#panel-admin .adm-cat-status{position:absolute;top:10px;left:10px;}
+#panel-admin .adm-cat-menu{position:absolute;top:8px;right:8px;display:flex;gap:6px;}
+#panel-admin .adm-cat-body{padding:14px 16px 16px;}
+#panel-admin .adm-cat-name{font-size:14.5px;font-weight:800;color:#131722;letter-spacing:-.01em;}
+#panel-admin .adm-cat-slug{font-size:11px;color:#aaa;margin-top:2px;font-family:monospace;}
+#panel-admin .adm-cat-meta{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid #f3f3f3;}
+#panel-admin .adm-cat-meta-item{font-size:11px;color:#888;}
+#panel-admin .adm-cat-meta-item b{color:#131722;font-size:13px;display:block;font-weight:800;}
+#panel-admin .adm-cat-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
+#panel-admin .adm-cat-link{font-size:11.5px;font-weight:700;color:#131722;background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px;}
+#panel-admin .adm-cat-link:hover{color:#ff3f6c;}
+#panel-admin .adm-cat-add{border:2px dashed #d8d8dc;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:210px;background:#fafafa;color:#aaa;cursor:pointer;transition:all .15s;font-size:12px;font-weight:600;}
+#panel-admin .adm-cat-add:hover{border-color:#131722;color:#131722;background:#fff;}
+#panel-admin .adm-cat-add .big{font-size:26px;}
+
+#panel-admin .adm-field select:disabled{background:#f6f6f7;color:#bbb;cursor:not-allowed;}
+#panel-admin .adm-field-hint{font-size:11px;color:#aaa;margin-top:5px;}
+#panel-admin .adm-form-actions{display:flex;align-items:center;justify-content:space-between;padding:4px 0 32px;gap:12px;flex-wrap:wrap;}
+#panel-admin .adm-form-actions-right{display:flex;gap:10px;flex-wrap:wrap;}
+#panel-admin .adm-btn.ghost.danger{color:#e5484d;border-color:#f3c8c8;}
+#panel-admin .adm-btn.ghost.danger:hover{background:#fdecec;border-color:#e5484d;}
+
+@media(max-width:600px){
+  #panel-admin .adm-cat-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
 }
 
 

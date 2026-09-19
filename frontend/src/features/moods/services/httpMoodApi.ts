@@ -26,7 +26,7 @@ function toMood(mood: MoodSummary): Mood {
     emoji: mood.emoji || existingDesign?.emoji || '✦',
     title: mood.name,
     subtitle: mood.tagline || mood.personalityTagline || 'A style for how you feel.',
-    image: existingDesign?.image || mood.bannerImageUrl || '',
+    image: mood.bannerImageUrl || existingDesign?.image || '',
     accentColor: mood.color || existingDesign?.accentColor || '#6B7280',
     brand: existingDesign?.brand || `${mood.name} Edit`,
     offer: existingDesign?.offer || 'Shop now',

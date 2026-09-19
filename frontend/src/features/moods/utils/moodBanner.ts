@@ -8,10 +8,9 @@ export function moodBannerUrl(slug: string, cacheKey?: string | number): string 
 }
 
 export function moodBannerBackground(mood: Mood): string {
-  const fallback = mood.image
+  return mood.image
     ? `url("${mood.image}")`
     : `linear-gradient(135deg, ${mood.accentColor}CC, #171923)`;
-  return `url("${moodBannerUrl(mood.id)}"), ${fallback}`;
 }
 
 export function useFallbackMoodImage(event: SyntheticEvent<HTMLImageElement>, fallback: string) {
