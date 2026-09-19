@@ -61,7 +61,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
 
   return (
     <div className="product-reviews-section">
-      <h3 className="reviews-title">Customer Reviews ({reviews.length})</h3>
+      <h3 className="reviews-title">Customer Reviews</h3>
 
       {loading ? (
         <div className="reviews-loading">Loading reviews...</div>
@@ -87,7 +87,6 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
                 {review.comment && <p className="review-comment">{review.comment}</p>}
                 <div className="review-footer">
                   <span className="review-date">{new Date(review.createdAt).toLocaleDateString('en-IN')}</span>
-                  <button type="button" className="helpful-btn">👍 Helpful ({review.helpfulCount})</button>
                 </div>
               </div>
             ))}
@@ -97,20 +96,24 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
             <div className="reviews-pagination">
               <button
                 type="button"
-                className="pagination-btn"
+                className="pagination-btn prev"
                 disabled={page === 0}
                 onClick={() => setPage(page - 1)}
               >
                 ← Previous
               </button>
-              <span className="pagination-info">Page {page + 1} of {totalPages}</span>
+              <span className="pagination-info">
+                <span className="page-number">{page + 1}</span>
+                <span className="page-separator">/</span>
+                <span className="total-pages">{totalPages}</span>
+              </span>
               <button
                 type="button"
-                className="pagination-btn"
+                className="pagination-btn next"
                 disabled={page >= totalPages - 1}
                 onClick={() => setPage(page + 1)}
               >
-                More →
+                Next →
               </button>
             </div>
           )}

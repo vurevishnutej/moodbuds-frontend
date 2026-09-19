@@ -1812,7 +1812,7 @@ body.view-profile{overflow-x:hidden;background:#fff;}
   border:2px solid transparent;outline:2px solid transparent;
   transition:outline-color 0.18s;
 }
-.pd-color.active{outline:2px solid #000;outline-offset:3px;}
+.pd-color.active{outline:2px solid #8b3a52;outline-offset:3px;}
 
 /* Size selector */
 .pd-sizes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
@@ -1822,8 +1822,8 @@ body.view-profile{overflow-x:hidden;background:#fff;}
   font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#666;
   cursor:pointer;transition:all 0.18s;
 }
-.pd-size:hover{border-color:#000;color:#000;}
-.pd-size.active{border-color:#000;background:#000;color:#fff;}
+.pd-size:hover{border-color:#8b3a52;color:#8b3a52;}
+.pd-size.active{border-color:#8b3a52;background:#8b3a52;color:#fff;}
 .pd-size.out{color:#ccc;border-color:#f0f0f0;cursor:not-allowed;text-decoration:line-through;}
 .pd-size-guide{font-size:11px;color:#aaa;text-decoration:underline;cursor:pointer;margin-bottom:20px;display:inline-block;background:none;border:none;font-family:'Inter',sans-serif;}
 
@@ -1838,19 +1838,20 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 /* CTA buttons */
 .pd-cta{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
 .pd-btn-cart{
-  width:100%;padding:15px;background:#000;color:#fff;border:none;
+  width:100%;padding:15px;background:#8b3a52;color:#fff;border:none;
   font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:0.26em;text-transform:uppercase;cursor:pointer;
   transition:background 0.2s;
 }
-.pd-btn-cart:hover{background:#222;}
+.pd-btn-cart:hover{background:#6b2d3f;}
+.pd-btn-cart:disabled{background:#ccc;cursor:not-allowed;}
 .pd-btn-wish{
-  width:100%;padding:14px;background:#fff;color:#000;
-  border:1.5px solid #000;
+  width:100%;padding:14px;background:#fff;color:#8b3a52;
+  border:1.5px solid #8b3a52;
   font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
   letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:background 0.2s,color 0.2s;
+  transition:background 0.2s,color 0.2s,border-color 0.2s;
 }
 .pd-btn-wish:hover{background:#000;color:#fff;}
 
