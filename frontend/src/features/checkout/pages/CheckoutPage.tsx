@@ -165,7 +165,6 @@ export function CheckoutPage() {
           </div>
         </div>
       </div>
-    </div>
 
       {showNewAddressModal && (
         <NewAddressModal
