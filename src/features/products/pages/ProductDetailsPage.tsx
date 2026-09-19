@@ -279,6 +279,11 @@ export function ProductDetailsPage() {
               <div style={{ marginBottom: '8px' }}>↩ 30-day hassle-free returns</div>
               <div>🔒 Secure checkout</div>
             </div>
+
+            {/* Reviews Section */}
+            <div style={{ marginTop: '24px' }}>
+              <ProductReviewsSection productSlug={product.id} pageSize={3} />
+            </div>
           </div>
         </div>
         <MobileFooter />
