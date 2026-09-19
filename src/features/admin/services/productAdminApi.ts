@@ -19,9 +19,8 @@ interface MoodRow {
 
 interface GstRateRow {
   id: number;
-  name: string;
-  rate_percentage: number | string;
-  hsn_code: string;
+  rate_name: string;
+  gst_percentage: number | string;
   is_active: number | boolean;
 }
 
@@ -120,7 +119,7 @@ export const productAdminApi = {
     const res = await adminApiClient.get<PageResponse<GstRateRow>>('/admin/gst-rates?page=0&size=100');
     return res.content
       .filter((g) => toBool(g.is_active))
-      .map((g) => ({ id: g.id, label: `${g.name} (${g.rate_percentage}%)` }));
+      .map((g) => ({ id: g.id, label: `${g.rate_name} (${g.gst_percentage}%)` }));
   },
 
   async uploadProductImages(files: File[]): Promise<UploadedImage[]> {

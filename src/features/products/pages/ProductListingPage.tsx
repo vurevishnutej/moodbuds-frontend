@@ -34,8 +34,8 @@ export function ProductListingPage() {
     ? priceValue as PriceRangeId
     : null;
   const filters: ListingFilters = useMemo(() => ({
-    category: searchParams.get('category'),
-    subcategory: searchParams.get('subcategory'),
+    categories: (searchParams.get('categories') ?? '').split(',').map((c) => c.trim()).filter(Boolean),
+    subcategories: (searchParams.get('subcategories') ?? '').split(',').map((s) => s.trim()).filter(Boolean),
     priceRange,
     sizes: (searchParams.get('sizes') ?? '').split(',').map((size) => size.trim()).filter(Boolean),
     isNew: searchParams.get('new') === 'true',
@@ -45,8 +45,8 @@ export function ProductListingPage() {
   const setFilters = (nextFilters: ListingFilters) => {
     const next = new URLSearchParams(searchParams);
     const setOrDelete = (key: string, value: string | null) => value ? next.set(key, value) : next.delete(key);
-    setOrDelete('category', nextFilters.category);
-    setOrDelete('subcategory', nextFilters.subcategory);
+    setOrDelete('categories', nextFilters.categories.length ? nextFilters.categories.join(',') : null);
+    setOrDelete('subcategories', nextFilters.subcategories.length ? nextFilters.subcategories.join(',') : null);
     setOrDelete('price', nextFilters.priceRange);
     setOrDelete('sizes', nextFilters.sizes.length ? nextFilters.sizes.join(',') : null);
     setOrDelete('new', nextFilters.isNew ? 'true' : null);
@@ -68,8 +68,8 @@ export function ProductListingPage() {
     return {
       moodId: mood?.id,
       sort,
-      category: filters.category || undefined,
-      subcategory: filters.subcategory || undefined,
+      category: filters.categories.length ? filters.categories.join(',') : undefined,
+      subcategory: filters.subcategories.length ? filters.subcategories.join(',') : undefined,
       onSale: filters.onSale || undefined,
       isNew: filters.isNew || undefined,
       sizes: filters.sizes.length ? filters.sizes : undefined,

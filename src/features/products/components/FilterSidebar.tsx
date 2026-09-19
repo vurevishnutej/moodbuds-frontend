@@ -8,8 +8,8 @@ import {
 export type PriceRangeId = 'under-999' | '999-1999' | '2000-3999' | '4000-plus';
 
 export interface ListingFilters {
-  category: string | null;
-  subcategory: string | null;
+  categories: string[];
+  subcategories: string[];
   priceRange: PriceRangeId | null;
   onSale: boolean;
   isNew: boolean;
@@ -64,7 +64,7 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
   useEffect(() => {
     let active = true;
     setSubcategories([]);
-    if (!filters.category) {
+    if (filters.categories.length !== 1) {
       setLoadingSubcategories(false);
       return () => {
         active = false;
@@ -72,7 +72,7 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
     }
 
     setLoadingSubcategories(true);
-    catalogFilterApi.listSubcategories(filters.category)
+    catalogFilterApi.listSubcategories(filters.categories[0])
       .then((items) => {
         if (active) setSubcategories(items);
       })
@@ -85,7 +85,17 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
     return () => {
       active = false;
     };
-  }, [filters.category]);
+  }, [filters.categories]);
+
+  const toggleCategory = (category: string) => {
+    const has = filters.categories.includes(category);
+    onChange({ ...filters, categories: has ? filters.categories.filter((c) => c !== category) : [...filters.categories, category], subcategories: [] });
+  };
+
+  const toggleSubcategory = (subcategory: string) => {
+    const has = filters.subcategories.includes(subcategory);
+    onChange({ ...filters, subcategories: has ? filters.subcategories.filter((s) => s !== subcategory) : [...filters.subcategories, subcategory] });
+  };
 
   const toggleSize = (size: string) => {
     const has = filters.sizes.includes(size);
@@ -93,7 +103,7 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
   };
 
   const hasFilters = Boolean(
-    filters.category || filters.subcategory || filters.priceRange || filters.sizes.length || filters.isNew || filters.onSale,
+    filters.categories.length || filters.subcategories.length || filters.sizes.length,
   );
 
   return (
@@ -110,9 +120,9 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
           <button
             type="button"
             className="sb-clear"
-            onClick={() => onChange({ category: null, subcategory: null, priceRange: null, sizes: [], isNew: false, onSale: false })}
+            onClick={() => onChange({ categories: [], subcategories: [], priceRange: null, sizes: [], isNew: false, onSale: false })}
           >
-            Clear all
+            Clear
           </button>
         )}
       </div>
@@ -120,19 +130,12 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
       <div className="sb-group">
         <div className="sb-group-head">Category <span>▾</span></div>
         <div className="sb-chip-row">
-          <button
-            type="button"
-            className={`sb-chip${filters.category === null ? ' active' : ''}`}
-            onClick={() => onChange({ ...filters, category: null, subcategory: null })}
-          >
-            All
-          </button>
           {categories.map((category) => (
             <button
               key={category.id}
               type="button"
-              className={`sb-chip${filters.category === category.slug ? ' active' : ''}`}
-              onClick={() => onChange({ ...filters, category: category.slug, subcategory: null })}
+              className={`sb-chip${filters.categories.includes(category.slug) ? ' active' : ''}`}
+              onClick={() => toggleCategory(category.slug)}
             >
               {category.name}
             </button>
@@ -141,23 +144,16 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
         </div>
       </div>
 
-      {filters.category && (
+      {filters.categories.length === 1 && (
         <div className="sb-group">
           <div className="sb-group-head">Subcategory <span>▾</span></div>
           <div className="sb-chip-row">
-            <button
-              type="button"
-              className={`sb-chip${filters.subcategory === null ? ' active' : ''}`}
-              onClick={() => onChange({ ...filters, subcategory: null })}
-            >
-              All
-            </button>
             {subcategories.map((subcategory) => (
               <button
                 key={subcategory.id}
                 type="button"
-                className={`sb-chip${filters.subcategory === subcategory.slug ? ' active' : ''}`}
-                onClick={() => onChange({ ...filters, subcategory: subcategory.slug })}
+                className={`sb-chip${filters.subcategories.includes(subcategory.slug) ? ' active' : ''}`}
+                onClick={() => toggleSubcategory(subcategory.slug)}
               >
                 {subcategory.name}
               </button>
@@ -183,42 +179,6 @@ export function FilterSidebar({ brandName, filters, onChange }: FilterSidebarPro
               {size}
             </button>
           ))}
-        </div>
-      </div>
-
-      <div className="sb-group">
-        <div className="sb-group-head">Price <span>▾</span></div>
-        <div className="sb-chip-row">
-          {PRICE_RANGES.map((range) => (
-            <button
-              key={range.id}
-              type="button"
-              className={`sb-chip${filters.priceRange === range.id ? ' active' : ''}`}
-              onClick={() => onChange({ ...filters, priceRange: filters.priceRange === range.id ? null : range.id })}
-            >
-              {range.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="sb-group">
-        <div className="sb-group-head">Availability <span>▾</span></div>
-        <div className="sb-chip-row">
-          <button
-            type="button"
-            className={`sb-chip${filters.isNew ? ' active' : ''}`}
-            onClick={() => onChange({ ...filters, isNew: !filters.isNew })}
-          >
-            New Arrivals
-          </button>
-          <button
-            type="button"
-            className={`sb-chip${filters.onSale ? ' active' : ''}`}
-            onClick={() => onChange({ ...filters, onSale: !filters.onSale })}
-          >
-            On Sale
-          </button>
         </div>
       </div>
 
