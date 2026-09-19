@@ -3171,3 +3171,11 @@ body.quiz-open{overflow:hidden;}
 }
 
 
+
+/* ── Hide emoji backgrounds for checkout view ───────────── */
+#view-checkout .view-emoji-bg,
+#view-checkout [class*="emoji"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}

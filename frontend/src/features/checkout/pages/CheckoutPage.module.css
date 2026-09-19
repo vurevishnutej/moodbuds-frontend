@@ -1,13 +1,24 @@
 #view-checkout {
-  background: #fff;
+  background: #fff !important;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
   color: #0f0f0f;
   position: relative;
 }
 
-/* Remove emoji backgrounds */
-#view-checkout .view-emoji-bg {
+/* Remove emoji backgrounds completely */
+#view-checkout .view-emoji-bg,
+#view-checkout [class*="emoji"],
+#view-checkout [class*="bg"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  z-index: -999 !important;
+}
+
+/* Hide any pseudo-elements that might have emojis */
+#view-checkout::before,
+#view-checkout::after {
   display: none !important;
 }
 
