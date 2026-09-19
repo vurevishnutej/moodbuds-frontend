@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MobileNavbar } from '../../../components/layout/MobileNavbar';
+import { MobileFooter } from '../../../components/layout/MobileFooter';
 import { SimpleNavbar } from '../../../components/layout/SimpleNavbar';
 import { useWishlist } from '../../../app/providers/WishlistProvider';
 import { useCart } from '../../../app/providers/CartProvider';
@@ -32,6 +34,43 @@ export function WishlistPage() {
 
   return (
     <div id="view-wishlist" className="mb-page-fade">
+      <div className="mb-mobile-shell">
+        <MobileNavbar />
+        <div style={{ padding: '16px' }}>
+          <h1 style={{ fontSize: '18px', marginBottom: '12px' }}>Saved items ({items.length})</h1>
+          {items.length === 0 ? (
+            <div style={{ textAlign: 'center', paddingTop: '40px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>♡</div>
+              <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Nothing saved yet</div>
+              <p style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>Items you heart while browsing will appear here.</p>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                style={{
+                  padding: '10px 24px',
+                  background: '#8b3a52',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                Shop by mood
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {sorted.map((item) => (
+                <WishlistCard key={item.id} item={item} onRemove={removeItem} onMoveToBag={handleMoveToBag} />
+              ))}
+            </div>
+          )}
+        </div>
+        <MobileFooter />
+      </div>
+
+      <div className="mb-desktop-only">
       <div id="wl-page">
         <SimpleNavbar
           navId="wl-navbar"
@@ -82,6 +121,7 @@ export function WishlistPage() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
