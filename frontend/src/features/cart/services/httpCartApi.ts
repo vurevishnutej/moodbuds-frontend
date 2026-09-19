@@ -1,67 +1,41 @@
-import type { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest } from '../../../types';
+import type { Cart, CartItem, AddToCartRequest } from '../../../types';
 import { apiClient } from '../../../services/api/apiClient';
 import type { CartApi, CheckoutApi } from './cartApi';
-
-interface CartItemResponse {
-  id: number;
-  productId: string;
-  name: string;
-  brand: string;
-  price: number;
-  originalPrice?: number;
-  quantity: number;
-  size: string;
-  color?: string;
-  image: string;
-  moodId: string;
-}
-
-interface CartResponse {
-  items: CartItemResponse[];
-  subtotal: number;
-  gstAmount: number;
-  deliveryCharge: number;
-  discount: number;
-  total: number;
-  appliedCoupon?: string;
-}
 
 interface AddCartItemRequest {
   productSlug: string;
   size: string;
-  color?: string;
   quantity: number;
-}
-
-interface UpdateCartItemRequest {
-  quantity?: number;
-  size?: string;
 }
 
 /**
  * Convert API CartResponse to frontend Cart format
  */
-function mapCartResponse(response: CartResponse): Cart {
+function mapCartResponse(response: any): Cart {
+  const items = response.items?.map((item: any) => ({
+    id: String(item.id),
+    productId: String(item.productId),
+    name: item.productName || 'Product',
+    brand: 'MoodBuds',
+    price: item.effectiveUnitPrice || item.currentUnitPrice || 0,
+    originalPrice: item.currentUnitDiscountPrice ? item.currentUnitPrice : null,
+    qty: item.quantity || 0,
+    size: item.size || '',
+    color: null,
+    image: item.primaryImageUrl || '/placeholder-product.jpg',
+    moodId: 'happy',
+  })) as CartItem[] || [];
+
+  const totals = response.totals || { sellingSubtotal: 0, gstAmount: 0, grandTotal: 0, productDiscount: 0 };
+
   return {
-    items: response.items.map(item => ({
-      id: String(item.id),
-      productId: item.productId,
-      name: item.name,
-      brand: item.brand,
-      price: item.price,
-      originalPrice: item.originalPrice || null,
-      qty: item.quantity,
-      size: item.size,
-      color: item.color || null,
-      image: item.image,
-      moodId: item.moodId,
-    })) as CartItem[],
-    subtotal: response.subtotal,
-    savings: 0, // Calculate from originalPrice
-    delivery: response.deliveryCharge,
-    discount: response.discount,
-    total: response.total,
-    promoCode: response.appliedCoupon || null,
+    items,
+    subtotal: totals.sellingSubtotal || 0,
+    savings: totals.productDiscount || 0,
+    delivery: 0,
+    discount: 0,
+    total: totals.grandTotal || 0,
+    promoCode: null,
   };
 }
 
@@ -73,7 +47,7 @@ export const httpCartApi: CartApi = {
    * GET /customer/cart - Get authenticated customer's cart
    */
   async getCart(): Promise<Cart> {
-    const response = await apiClient.get<CartResponse>('/customer/cart');
+    const response = await apiClient.get<any>('/customer/cart');
     return mapCartResponse(response);
   },
 
@@ -82,25 +56,24 @@ export const httpCartApi: CartApi = {
    */
   async addToCart(request: AddToCartRequest): Promise<Cart> {
     const payload: AddCartItemRequest = {
-      productSlug: request.product.slug || request.product.id, // Use slug, fallback to id
+      productSlug: request.product.slug || String(request.product.id),
       size: request.size,
-      color: request.color || undefined,
       quantity: request.qty || 1,
     };
 
-    const response = await apiClient.post<CartResponse>('/customer/cart/items', payload);
+    const response = await apiClient.post<any>('/customer/cart/items', payload);
     return mapCartResponse(response);
   },
 
   /**
    * PATCH /customer/cart/items/{itemId} - Update cart item
    */
-  async updateCartItem(request: UpdateCartItemRequest): Promise<Cart> {
-    const payload: UpdateCartItemRequest = {};
+  async updateCartItem(request: any): Promise<Cart> {
+    const payload: any = {};
     if (request.qty !== undefined) payload.quantity = request.qty;
+    if (request.size !== undefined) payload.size = request.size;
     if (request.itemId !== undefined) {
-      // itemId is in the request but used in URL
-      const response = await apiClient.patch<CartResponse>(
+      const response = await apiClient.patch<any>(
         `/customer/cart/items/${request.itemId}`,
         payload
       );
@@ -113,20 +86,16 @@ export const httpCartApi: CartApi = {
    * DELETE /customer/cart/items/{itemId} - Remove item from cart
    */
   async removeCartItem(itemId: string): Promise<Cart> {
-    const response = await apiClient.delete<CartResponse>(`/customer/cart/items/${itemId}`);
+    const response = await apiClient.delete<any>(`/customer/cart/items/${itemId}`);
     return mapCartResponse(response);
   },
 
   /**
    * POST /customer/cart - Apply promo code
-   * Note: Need to check actual endpoint for applying coupon
    */
   async applyPromoCode(code: string): Promise<Cart> {
     try {
-      // This endpoint might need adjustment based on actual API
-      const response = await apiClient.post<CartResponse>('/customer/cart/apply-coupon', {
-        code,
-      });
+      const response = await apiClient.post<any>('/customer/cart/apply-coupon', { code });
       return mapCartResponse(response);
     } catch (error) {
       throw new Error(`Invalid promo code: ${code}`);
@@ -137,7 +106,7 @@ export const httpCartApi: CartApi = {
    * DELETE /customer/cart - Clear cart
    */
   async clearCart(): Promise<Cart> {
-    const response = await apiClient.delete<CartResponse>('/customer/cart');
+    const response = await apiClient.delete<any>('/customer/cart');
     return mapCartResponse(response);
   },
 };
