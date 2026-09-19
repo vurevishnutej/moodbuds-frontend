@@ -119,9 +119,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <span className="chev">›</span>
           </span>
         </button>
-        <Link to="/admin" className="mmb-drawer-link" onClick={onClose}>
-          Admin <span className="chev">›</span>
-        </Link>
         <Link to="/contact-us" className="mmb-drawer-link" onClick={onClose}>
           Contact Us <span className="chev">›</span>
         </Link>

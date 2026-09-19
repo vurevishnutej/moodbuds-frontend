@@ -59,7 +59,6 @@ export function ListingHeader({ activeMoodId }: { activeMoodId?: string }) {
               </svg>
               <span className="icon-badge">{cartCount || ''}</span>
             </Link>}
-            <Link className="nav-action nav-admin-link" to="/admin">Admin</Link>
           </div>
         </div>
       </div>

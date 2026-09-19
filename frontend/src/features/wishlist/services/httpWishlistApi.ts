@@ -12,6 +12,7 @@ interface WishlistItemResponse {
   discountPrice?: number | null;
   effectivePrice: number;
   selectedSize?: string | null;
+  availableSizes: string[];
   addedAt: string;
 }
 
@@ -31,7 +32,9 @@ function mapWishlistResponse(response: WishlistResponse): WishlistItem[] {
     brand: '',
     price: item.effectivePrice / 100,
     originalPrice: item.discountPrice != null ? item.price / 100 : null,
-    sizes: item.selectedSize ? [item.selectedSize] : [],
+    sizes: item.selectedSize
+      ? [item.selectedSize, ...(item.availableSizes ?? []).filter((size) => size !== item.selectedSize)]
+      : item.availableSizes ?? [],
     image: item.primaryImageUrl,
     savedAt: Date.parse(item.addedAt) || Date.now(),
   }));
@@ -51,6 +54,11 @@ export const httpWishlistApi: WishlistApi = {
 
   async removeFromWishlist(itemId: string) {
     await apiClient.delete<void>(`/customer/wishlist/items/${itemId}`);
+    return this.getWishlist();
+  },
+
+  async moveToCart(itemId: string, size: string) {
+    await apiClient.post(`/customer/wishlist/items/${itemId}/move-to-cart`, { size, quantity: 1 });
     return this.getWishlist();
   },
 

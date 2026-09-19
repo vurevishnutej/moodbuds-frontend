@@ -1,108 +1,112 @@
-import type { Product, ProductQuery, MoodId } from '../../../types';
+import type { MoodId, Product, ProductQuery } from '../../../types';
 import { apiClient } from '../../../services/api/apiClient';
 import type { ProductApi } from './productApi';
 
-interface ProductCard {
-  id: string;
+interface CategoryRef { name: string }
+
+interface ProductCardResponse {
+  id: number;
+  slug: string;
   name: string;
-  brand: string;
   price: number;
-  originalPrice?: number;
-  image: string;
-  badge?: string;
-  rating: number;
-  reviewCount: number;
+  discountPrice?: number | null;
+  effectivePrice: number;
+  primaryImageUrl?: string | null;
+  newArrival: boolean;
+  category: CategoryRef;
 }
 
-interface ProductDetail extends ProductCard {
-  moodId: MoodId;
-  sizes: string[];
-  colors: Array<{ name: string; hex: string }>;
-  description: string;
+interface ProductDetailResponse extends ProductCardResponse {
+  description?: string | null;
+  colorName?: string | null;
+  images: Array<{ imageUrl: string; primary: boolean }>;
+  sizes: Array<{ size: string; inStock: boolean }>;
+  moods: Array<{ slug: string }>;
 }
 
-interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
+interface PageResponse<T> { content: T[] }
+
+const sortForBackend = (sort: ProductQuery['sort']) => sort === 'new' ? 'newest' : sort;
+
+function mapCard(item: ProductCardResponse, moodId: MoodId = 'happy'): Product {
+  return {
+    id: item.slug,
+    name: item.name,
+    brand: item.category.name,
+    moodId,
+    price: item.effectivePrice / 100,
+    originalPrice: item.discountPrice != null ? item.price / 100 : null,
+    badge: item.discountPrice != null ? 'Sale' : item.newArrival ? 'New' : null,
+    image: item.primaryImageUrl || '',
+    sizes: [],
+    colors: [],
+    rating: 0,
+    reviewCount: 0,
+    description: '',
+  };
 }
 
-/**
- * Real HTTP Product API implementation using backend endpoints.
- * Maps frontend ProductQuery to backend query parameters.
- */
+function mapDetail(item: ProductDetailResponse): Product {
+  const primaryImage = item.images.find((image) => image.primary)?.imageUrl || item.images[0]?.imageUrl || '';
+  return {
+    ...mapCard({ ...item, primaryImageUrl: primaryImage }, item.moods[0]?.slug || 'happy'),
+    sizes: item.sizes.filter((size) => size.inStock).map((size) => size.size),
+    colors: item.colorName ? [{ name: item.colorName, hex: '#cccccc' }] : [],
+    description: item.description || '',
+  };
+}
+
+function mapPage(response: PageResponse<ProductCardResponse>, moodId?: MoodId, onSale?: boolean) {
+  const products = response.content.map((item) => mapCard(item, moodId));
+  return onSale ? products.filter((product) => product.badge === 'Sale') : products;
+}
+
 export const httpProductApi: ProductApi = {
-  /**
-   * GET /products - Search and filter products
-   */
-  async getProducts(query?: ProductQuery): Promise<Product[]> {
+  async getProducts(query?: ProductQuery) {
     const params = new URLSearchParams();
     if (query?.search) params.set('q', query.search);
     if (query?.moodId) params.set('mood', query.moodId);
-    if (query?.sort) params.set('sort', query.sort);
-    if (query?.onSale) params.set('onSale', 'true');
+    if (query?.sort) params.set('sort', sortForBackend(query.sort) || 'newest');
     if (query?.isNew) params.set('newArrival', 'true');
+    if (query?.sizes?.[0]) params.set('productSize', query.sizes[0]);
+    if (query?.minPrice != null) params.set('minPrice', String(Math.round(query.minPrice * 100)));
+    if (query?.maxPrice != null) params.set('maxPrice', String(Math.round(query.maxPrice * 100)));
+    params.set('size', '100');
 
-    const queryStr = params.toString();
-    const path = queryStr ? `/products?${queryStr}` : '/products';
-
-    const response = await apiClient.get<PageResponse<ProductCard>>(path);
-    return response.content as unknown as Product[];
+    const response = await apiClient.get<PageResponse<ProductCardResponse>>(`/products?${params.toString()}`);
+    return mapPage(response, query?.moodId, query?.onSale);
   },
 
-  /**
-   * GET /products/{slug} - Get product detail by slug
-   */
-  async getProductById(id: string): Promise<Product | null> {
+  async getProductById(id: string) {
     try {
-      const product = await apiClient.get<ProductDetail>(`/products/${id}`);
-      return product as unknown as Product;
+      return mapDetail(await apiClient.get<ProductDetailResponse>(`/products/${id}`));
     } catch {
       return null;
     }
   },
 
-  /**
-   * GET /moods/{slug}/products - Get products for a specific mood
-   */
-  async getProductsByMood(moodId: MoodId): Promise<Product[]> {
+  async getProductsByMood(moodId: MoodId) {
     try {
-      const response = await apiClient.get<PageResponse<ProductCard>>(`/moods/${moodId}/products`);
-      return response.content as unknown as Product[];
+      const response = await apiClient.get<PageResponse<ProductCardResponse>>(`/moods/${moodId}/products?size=100`);
+      return mapPage(response, moodId);
     } catch (error) {
       console.error(`Failed to fetch products for mood ${moodId}:`, error);
       return [];
     }
   },
 
-  /**
-   * GET /products - Search products by query
-   */
-  async searchProducts(query: string): Promise<Product[]> {
-    const params = new URLSearchParams();
-    params.set('q', query);
-
-    const response = await apiClient.get<PageResponse<ProductCard>>(`/products?${params.toString()}`);
-    return response.content as unknown as Product[];
+  async searchProducts(query: string) {
+    const params = new URLSearchParams({ q: query, size: '100' });
+    return mapPage(await apiClient.get<PageResponse<ProductCardResponse>>(`/products?${params.toString()}`));
   },
 
-  /**
-   * Note: Backend doesn't have /products/{id}/related endpoint yet.
-   * For now, we fetch same mood products as a fallback.
-   */
-  async getRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
+  async getRelatedProducts(product: Product, limit = 4) {
     try {
-      const response = await apiClient.get<PageResponse<ProductCard>>(
-        `/moods/${product.moodId}/products?size=${limit}`
+      const response = await apiClient.get<PageResponse<ProductCardResponse>>(
+        `/moods/${product.moodId}/products?size=${limit + 1}`,
       );
-      // Filter out the current product
-      return response.content
-        .filter((p: ProductCard) => p.id !== product.id)
-        .slice(0, limit) as unknown as Product[];
-    } catch (error) {
-      console.error('Failed to fetch related products:', error);
+      return mapPage(response, product.moodId).filter((item) => item.id !== product.id).slice(0, limit);
+    } catch {
       return [];
     }
   },

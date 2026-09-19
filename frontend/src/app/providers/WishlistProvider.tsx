@@ -10,6 +10,8 @@ interface WishlistContextValue {
   isWishlisted: (productId: string) => boolean;
   toggleWishlist: (product: Product) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
+  moveToCart: (itemId: string, size: string) => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
@@ -25,6 +27,11 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     wishlistService.getWishlist().then(setItems).catch(() => setItems([])).finally(() => setLoading(false));
   }, [isAuthenticated, customer?.id]);
+
+  const refresh = useCallback(async () => {
+    if (!isAuthenticated) { setItems([]); return; }
+    setItems(await wishlistService.getWishlist());
+  }, [isAuthenticated]);
 
   const isWishlisted = useCallback(
     (productId: string) => items.some((i) => i.productId === productId),
@@ -53,9 +60,20 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     setItems(next);
   }, []);
 
+  const moveToCart = useCallback(async (itemId: string, size: string) => {
+    if (!size) { toast.info('Choose a size before moving this item'); return; }
+    try {
+      setItems(await wishlistService.moveToCart(itemId, size));
+      toast.success('Moved to bag');
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : 'Could not move this item to your bag');
+      throw cause;
+    }
+  }, [toast]);
+
   const value = useMemo(
-    () => ({ items, loading, isWishlisted, toggleWishlist, removeItem }),
-    [items, loading, isWishlisted, toggleWishlist, removeItem]
+    () => ({ items, loading, isWishlisted, toggleWishlist, removeItem, moveToCart, refresh }),
+    [items, loading, isWishlisted, toggleWishlist, removeItem, moveToCart, refresh]
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

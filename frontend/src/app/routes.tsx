@@ -13,7 +13,7 @@ import { ProfileInfoPage } from '../features/profile/pages/ProfileInfoPage';
 import { OrdersPage } from '../features/profile/pages/OrdersPage';
 import { AddressesPage } from '../features/profile/pages/AddressesPage';
 import { CouponsPage } from '../features/profile/pages/CouponsPage';
-import { ContactPage } from '../features/profile/pages/ContactPage';
+import { ProfileWishlistPage } from '../features/profile/pages/ProfileWishlistPage';
 import { AboutUsPage } from '../features/content/pages/AboutUsPage';
 import { ContactUsPage } from '../features/content/pages/ContactUsPage';
 import { AdminLayout, AdminHub } from '../features/admin/pages/AdminLayout';
@@ -66,10 +66,9 @@ export function AppRoutes() {
         <Route index element={<ProfileOverviewPage />} />
         <Route path="info" element={<ProfileInfoPage />} />
         <Route path="orders" element={<OrdersPage />} />
+        <Route path="wishlist" element={<ProfileWishlistPage />} />
         <Route path="addresses" element={<AddressesPage />} />
         <Route path="coupons" element={<CouponsPage />} />
-        <Route path="contact" element={<ContactPage />} />
-
       </Route>
 
       <Route path="/admin/login" element={<AdminGuestRoute><AdminLoginPage /></AdminGuestRoute>} />

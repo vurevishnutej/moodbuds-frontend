@@ -13,8 +13,8 @@ import type { CartItem } from '../../../types';
 
 export function CartPage() {
   useBodyViewClass('cart');
-  const { cart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh } = useCart();
-  const { toggleWishlist } = useWishlist();
+  const { cart, updateQty, removeItem, moveToWishlist, applyPromoCode, removePromoCode, refresh } = useCart();
+  const { refresh: refreshWishlist } = useWishlist();
   const toast = useToast();
   const navigate = useNavigate();
   const [checkingOut, setCheckingOut] = useState(false);
@@ -22,22 +22,8 @@ export function CartPage() {
   const count = cart.items.reduce((s, i) => s + i.qty, 0);
 
   const handleMoveToWishlist = async (item: CartItem) => {
-    await toggleWishlist({
-      id: item.productId,
-      name: item.name,
-      brand: item.brand,
-      moodId: item.moodId ?? 'happy',
-      price: item.price,
-      originalPrice: item.originalPrice,
-      badge: null,
-      image: item.image,
-      sizes: [item.size],
-      colors: [],
-      rating: 0,
-      reviewCount: 0,
-      description: '',
-    });
-    await removeItem(item.id);
+    await moveToWishlist(item.id);
+    await refreshWishlist();
   };
 
   const handleCheckout = async () => {

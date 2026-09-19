@@ -1,4 +1,4 @@
-import type { WishlistItem, Product } from '../../../types';
+import type { CartItem, WishlistItem, Product } from '../../../types';
 import { WISHLIST_SEED } from '../../../data/wishlistSeed';
 import { storage, STORAGE_KEYS } from '../../../services/storage/storageService';
 import { delay, uniqueId } from '../../../utils/format';
@@ -43,6 +43,25 @@ export const mockWishlistApi: WishlistApi = {
     const items = readItems().filter((i) => i.id !== itemId);
     writeItems(items);
     return items;
+  },
+
+  async moveToCart(itemId: string, size: string) {
+    await delay(150);
+    const items = readItems();
+    const item = items.find((candidate) => candidate.id === itemId);
+    if (!item) return items;
+    const cart = storage.get<CartItem[]>(STORAGE_KEYS.cart, []);
+    if (!cart.some((line) => line.productId === item.productId && line.size === size)) {
+      cart.push({
+        id: uniqueId('cart'), productId: item.productId, moodId: item.moodId,
+        name: item.name, brand: item.brand, price: item.price,
+        originalPrice: item.originalPrice, qty: 1, size, image: item.image,
+      });
+      storage.set(STORAGE_KEYS.cart, cart);
+    }
+    const next = items.filter((candidate) => candidate.id !== itemId);
+    writeItems(next);
+    return next;
   },
 
   async isWishlisted(productId: string) {

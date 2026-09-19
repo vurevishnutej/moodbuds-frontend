@@ -624,40 +624,6 @@ select:focus-visible{
 }
 .mbf-links a:hover{color:#fff;}
 
-/* Newsletter strip */
-.mbf-news{
-  border-top:1px solid rgba(255,255,255,0.06);
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  padding:clamp(18px,3vh,28px) clamp(20px,4vw,52px);
-}
-.mbf-news-inner{
-  max-width:1320px;margin:0 auto;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:20px;flex-wrap:wrap;
-}
-.mbf-news-text{}
-.mbf-news-head{
-  font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);
-  margin-bottom:3px;
-}
-.mbf-news-sub{font-size:11px;color:rgba(255,255,255,0.3);}
-.mbf-news-form{display:flex;gap:0;min-width:280px;}
-.mbf-news-input{
-  flex:1;border:none;border-bottom:1px solid rgba(255,255,255,0.2);
-  background:transparent;padding:10px 0;
-  font-family:'Inter',sans-serif;font-size:12px;color:#fff;outline:none;
-}
-.mbf-news-input::placeholder{color:rgba(255,255,255,0.22);}
-.mbf-news-input:focus{border-bottom-color:rgba(255,255,255,0.5);}
-.mbf-news-btn{
-  padding:10px 20px;background:#fff;color:#000;border:none;
-  font-family:'Inter',sans-serif;font-size:10px;font-weight:700;
-  letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;
-  transition:background 0.2s;margin-left:12px;
-  white-space:nowrap;
-}
-.mbf-news-btn:hover{background:#e0e0e0;}
-
 /* Bottom bar */
 .mbf-bottom{
   max-width:1320px;margin:0 auto;
@@ -683,8 +649,6 @@ select:focus-visible{
   .mbf-top{grid-template-columns:1fr;}
   .mbf-brand-col{grid-column:auto;}
   .mbf-bottom{flex-direction:column;align-items:flex-start;gap:10px;}
-  .mbf-news-inner{flex-direction:column;align-items:flex-start;}
-  .mbf-news-form{width:100%;}
 }
 /* ══ PROFILE HOVER DROPDOWN ══════════════════════════════════ */
 .nav-profile-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;}
@@ -825,7 +789,7 @@ select:focus-visible{
 .prof-mc-badge{text-align:right;flex-shrink:0;}
 .prof-mc-badge-name{font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
 .prof-mc-badge-tier{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;font-style:italic;color:#c9748a;}
-.prof-mc-perks{display:flex;flex-direction:column;gap:10px;margin-bottom:clamp(16px,3vh,28px);}
+.prof-mc-perks{display:flex;flex-direction:column;gap:10px;margin-bottom:0;}
 .prof-mc-perk{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.6);}
 .prof-mc-perk-ico{font-size:15px;flex-shrink:0;}
 .prof-mc-progress-label{
@@ -850,11 +814,16 @@ select:focus-visible{
 }
 .prof-tile:hover{border-color:#000;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
 .prof-tile-ico{
-  width:36px;height:36px;
+  width:40px;height:40px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  color:#666;
+  color:#555;background:#f5f5f5;
 }
 .prof-tile-ico svg{width:24px;height:24px;}
+.prof-tile-ico.orders{color:#49637a;background:#eef4f8;}
+.prof-tile-ico.wishlist{color:#b55772;background:#fff0f4;}
+.prof-tile-ico.coupons{color:#9a6a16;background:#fff7e6;}
+.prof-tile-ico.addresses{color:#47725e;background:#eef8f2;}
+.prof-tile-ico.profile{color:#67568a;background:#f3effa;}
 .prof-tile-name{font-size:13px;font-weight:700;color:#000;}
 .prof-tile-desc{font-size:11px;color:#aaa;line-height:1.4;}
 .prof-tile-arrow{font-size:11px;color:#ccc;margin-top:auto;}
@@ -946,6 +915,7 @@ select:focus-visible{
 .prof-wl-name{font-size:12px;color:#000;margin-bottom:4px;line-height:1.35;}
 .prof-wl-price{font-size:12px;font-weight:600;color:#000;}
 .prof-wl-go{display:inline-block;margin-top:16px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#000;background:none;border:none;border-bottom:1.5px solid #000;padding-bottom:2px;cursor:pointer;font-family:'Inter',sans-serif;}
+.prof-wishlist-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;}
 
 /* ── Contact Us ── */
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
@@ -990,6 +960,7 @@ select:focus-visible{
   .prof-form-row,.addr-grid,.contact-grid,.coupon-grid{grid-template-columns:1fr;}
   .prof-tiles{grid-template-columns:1fr 1fr;}
   .prof-wl-grid{grid-template-columns:repeat(2,1fr);}
+  .prof-wishlist-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 /* ── end profile ── */
 #site-footer{display:block;}
@@ -1382,6 +1353,24 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 .cart-sum-row.saving{color:#000;font-weight:500;}
 .cart-sum-row span:last-child{color:#000;}
 .cart-sum-row.saving span:last-child{color:#000;}
+
+.cart-coupons{margin:18px 0 14px;padding-top:15px;border-top:1px solid #e8e8e8;}
+.cart-coupons-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#555;}
+.cart-coupons-head span:last-child{color:#aaa;}
+.cart-coupons-state,.cart-coupons-retry{width:100%;padding:13px 0;font:11px 'Inter',sans-serif;color:#aaa;text-align:left;background:none;border:none;}
+.cart-coupons-retry{cursor:pointer;color:#555;}
+.cart-coupon-list{display:flex;flex-direction:column;gap:8px;max-height:255px;overflow:auto;padding-right:2px;}
+.cart-coupon-card{display:flex;align-items:center;gap:10px;border:1px dashed #d8d8d8;padding:11px 10px 11px 13px;background:#fff;transition:border-color .18s,background .18s;}
+.cart-coupon-card.applied{border-color:#47725e;background:#f5fbf7;}
+.cart-coupon-copy{flex:1;min-width:0;}
+.cart-coupon-code{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#111;}
+.cart-coupon-code span{padding:2px 5px;border-radius:8px;background:#fff0f4;color:#b55772;font-size:7px;letter-spacing:.04em;text-transform:uppercase;}
+.cart-coupon-offer{margin-top:3px;font-size:10px;color:#666;line-height:1.35;}
+.cart-coupon-meta{margin-top:4px;font-size:9px;color:#999;line-height:1.35;}
+.cart-coupon-meta.short{color:#a56b1b;}
+.cart-coupon-apply{flex-shrink:0;border:none;background:none;color:#111;font:700 9px 'Inter',sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:7px 3px;}
+.cart-coupon-card.applied .cart-coupon-apply{color:#47725e;}
+.cart-coupon-apply:disabled{color:#bbb;cursor:not-allowed;}
 
 /* Promo code */
 .cart-promo{

@@ -4,16 +4,11 @@ import { useAuth } from '../../../app/providers/AuthProvider';
 
 const NAV_ITEMS: { to: string; label: string; end?: boolean }[] = [
   { to: '/profile', label: 'Overview', end: true },
-  { to: '/profile/info', label: 'Profile' },
-];
-const NAV_ITEMS_2: { to: string; label: string }[] = [
   { to: '/profile/orders', label: 'Orders' },
-  { to: '/wishlist', label: 'Wishlist' },
+  { to: '/profile/wishlist', label: 'Wishlist' },
   { to: '/profile/addresses', label: 'Addresses' },
-];
-const NAV_ITEMS_3: { to: string; label: string }[] = [
   { to: '/profile/coupons', label: 'Coupons' },
-  { to: '/profile/contact', label: 'Contact Us' },
+  { to: '/profile/info', label: 'Profile' },
 ];
 
 export function ProfileSidebar() {
@@ -45,20 +40,6 @@ export function ProfileSidebar() {
       <div className="prof-side-nav">
         {NAV_ITEMS.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className={itemClass}>
-            <span>{item.label}</span>
-            <span className="prof-nav-arrow">›</span>
-          </NavLink>
-        ))}
-        <div className="prof-nav-divider" />
-        {NAV_ITEMS_2.map((item) => (
-          <NavLink key={item.to} to={item.to} className={itemClass}>
-            <span>{item.label}</span>
-            <span className="prof-nav-arrow">›</span>
-          </NavLink>
-        ))}
-        <div className="prof-nav-divider" />
-        {NAV_ITEMS_3.map((item) => (
-          <NavLink key={item.to} to={item.to} className={itemClass}>
             <span>{item.label}</span>
             <span className="prof-nav-arrow">›</span>
           </NavLink>

@@ -12,6 +12,7 @@ interface CartContextValue {
   addToCart: (product: Product, size: string, color?: string | null, qty?: number) => Promise<void>;
   updateQty: (itemId: string, qty: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
+  moveToWishlist: (itemId: string) => Promise<void>;
   applyPromoCode: (code: string) => Promise<boolean>;
   removePromoCode: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -48,7 +49,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const updateQty = useCallback(async (itemId: string, qty: number) => {
-    const next = await cartService.updateCartItem({ itemId, qty });
+    const next = qty <= 0
+      ? await cartService.removeCartItem(itemId)
+      : await cartService.updateCartItem({ itemId, qty });
     setCart(next);
   }, []);
 
@@ -70,7 +73,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return true;
       } catch (error) {
         let text='That code did not quite fit. Check it and try again.';
-        if(error instanceof Error){try{const body=JSON.parse(error.message) as {detail?:string;message?:string};text=body.detail||body.message||text;}catch{/* friendly fallback */}}
+        if (error instanceof Error && error.message) text = error.message;
         toast.error(text);
         return false;
       }
@@ -78,13 +81,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [toast]
   );
 
+  const moveToWishlist = useCallback(async (itemId: string) => {
+    try {
+      setCart(await cartService.moveToWishlist(itemId));
+      toast.success('Saved for later');
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : 'Could not save this item for later');
+      throw cause;
+    }
+  }, [toast]);
+
   const removePromoCode = useCallback(async () => {
     const next=await cartService.removePromoCode(); setCart(next); toast.info('Coupon removed');
   },[toast]);
 
   const value = useMemo(
-    () => ({ cart, loading, addToCart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh }),
-    [cart, loading, addToCart, updateQty, removeItem, applyPromoCode, removePromoCode, refresh]
+    () => ({ cart, loading, addToCart, updateQty, removeItem, moveToWishlist, applyPromoCode, removePromoCode, refresh }),
+    [cart, loading, addToCart, updateQty, removeItem, moveToWishlist, applyPromoCode, removePromoCode, refresh]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

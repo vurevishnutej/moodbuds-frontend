@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Cart } from '../../../types';
 import { formatINR } from '../../../utils/format';
+import { couponOffer, couponService, type CustomerCoupon } from '../../coupons/services/couponService';
 
 interface PriceSummaryProps {
   cart: Cart;
@@ -12,14 +13,34 @@ interface PriceSummaryProps {
 
 export function PriceSummary({ cart, onApplyPromo, onRemovePromo, onCheckout, checkingOut }: PriceSummaryProps) {
   const [promoInput, setPromoInput] = useState('');
-  const [applying, setApplying] = useState(false);
+  const [applyingCode, setApplyingCode] = useState('');
+  const [coupons, setCoupons] = useState<CustomerCoupon[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(true);
+  const [couponsError, setCouponsError] = useState(false);
 
-  const handleApply = async () => {
-    if (!promoInput.trim() || applying) return;
-    setApplying(true);
-    const ok = await onApplyPromo(promoInput);
+  const loadCoupons = async () => {
+    setCouponsLoading(true);
+    setCouponsError(false);
+    try { setCoupons(await couponService.available()); }
+    catch { setCouponsError(true); }
+    finally { setCouponsLoading(false); }
+  };
+
+  useEffect(() => { void loadCoupons(); }, []);
+
+  const handleApply = async (code: string) => {
+    const normalized = code.trim().toUpperCase();
+    if (!normalized || applyingCode) return;
+    setApplyingCode(normalized);
+    const ok = await onApplyPromo(normalized);
     if (ok) setPromoInput('');
-    setApplying(false);
+    setApplyingCode('');
+  };
+
+  const handleRemove = async () => {
+    if (applyingCode) return;
+    setApplyingCode(cart.promoCode || 'REMOVE');
+    try { await onRemovePromo(); } finally { setApplyingCode(''); }
   };
 
   return (
@@ -47,6 +68,52 @@ export function PriceSummary({ cart, onApplyPromo, onRemovePromo, onCheckout, ch
         </div>
       )}
 
+      <div className="cart-coupons">
+        <div className="cart-coupons-head">
+          <span>Available coupons</span>
+          {!couponsLoading && <span>{coupons.length}</span>}
+        </div>
+        {couponsLoading ? (
+          <div className="cart-coupons-state">Finding your offers…</div>
+        ) : couponsError ? (
+          <button type="button" className="cart-coupons-retry" onClick={() => void loadCoupons()}>Couldn&apos;t load offers · Retry</button>
+        ) : coupons.length === 0 ? (
+          <div className="cart-coupons-state">No account offers available right now.</div>
+        ) : (
+          <div className="cart-coupon-list">
+            {coupons.map((coupon) => {
+              const applied = cart.promoCode === coupon.code;
+              const missingPaise = Math.max(0, coupon.minOrderValue - Math.round(cart.subtotal * 100));
+              const eligible = missingPaise === 0;
+              return (
+                <div className={`cart-coupon-card${applied ? ' applied' : ''}`} key={coupon.code}>
+                  <div className="cart-coupon-copy">
+                    <div className="cart-coupon-code">
+                      {coupon.code}
+                      {coupon.audience === 'ASSIGNED_USERS' && <span>Just for you</span>}
+                    </div>
+                    <div className="cart-coupon-offer">{coupon.description || couponOffer(coupon)}</div>
+                    <div className={`cart-coupon-meta${eligible ? '' : ' short'}`}>
+                      {eligible
+                        ? `${couponOffer(coupon)}${coupon.validUntil ? ` · Expires ${new Date(coupon.validUntil).toLocaleDateString('en-IN')}` : ''}`
+                        : `Add ${formatINR(missingPaise / 100)} more to use this coupon`}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="cart-coupon-apply"
+                    disabled={!eligible || !!applyingCode}
+                    onClick={() => void (applied ? handleRemove() : handleApply(coupon.code))}
+                  >
+                    {applyingCode === coupon.code ? 'Applying…' : applied ? 'Remove' : 'Apply'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="cart-promo">
         <input
           type="text"
@@ -55,10 +122,10 @@ export function PriceSummary({ cart, onApplyPromo, onRemovePromo, onCheckout, ch
           value={cart.promoCode ?? promoInput}
           disabled={!!cart.promoCode}
           onChange={(e) => setPromoInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleApply()}
+          onKeyDown={(e) => e.key === 'Enter' && void handleApply(promoInput)}
         />
-        <button type="button" onClick={cart.promoCode ? () => void onRemovePromo() : handleApply} disabled={applying}>
-          {cart.promoCode ? 'Remove' : 'Apply'}
+        <button type="button" onClick={() => void (cart.promoCode ? handleRemove() : handleApply(promoInput))} disabled={!!applyingCode}>
+          {applyingCode ? 'Please wait' : cart.promoCode ? 'Remove' : 'Apply'}
         </button>
       </div>
 

@@ -5,6 +5,7 @@ import { ADMIN_USERS, ADMIN_ROLES, ADMIN_PERMISSIONS } from '../../../data/admin
 import { useToast } from '../../../app/providers/ToastProvider';
 import { adminQuizService, type AdminSummary } from '../services/adminQuizService';
 import { siteContentService, type AdminSiteContent, type SiteContentDraft } from '../../content/services/siteContentService';
+import { socialLinkService, type SocialLink } from '../../content/services/socialLinkService';
 import { ApiError } from '../../../services/api/apiClient';
 
 const EMPTY_CONTENT: SiteContentDraft = {
@@ -111,44 +112,66 @@ export function AboutContactPage() {
   );
 }
 
-const SOCIAL = [
-  ['Instagram', '@moodbuds', '🟣'],
-  ['Facebook', '/moodbuds', '🔵'],
-  ['Twitter / X', '@moodbuds', '⚫'],
-  ['YouTube', 'MoodBuds', '🔴'],
-  ['Pinterest', 'moodbuds', '🟥'],
-  ['LinkedIn', 'moodbuds', '🔷'],
-];
+const SOCIAL_ICONS: Record<string, string> = {
+  instagram: '🟣', facebook: '🔵', x: '⚫', youtube: '🔴', pinterest: '🟥', linkedin: '🔷',
+};
 
 export function SocialLinksPage() {
-  const [enabled, setEnabled] = useState<Record<string, boolean>>(
-    Object.fromEntries(SOCIAL.map(([name]) => [name, name !== 'LinkedIn']))
-  );
   const toast = useToast();
+  const [links, setLinks] = useState<SocialLink[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const load = async () => {
+    setLoading(true); setError('');
+    try { setLinks(await socialLinkService.admin()); }
+    catch (cause) { setError(contentError(cause)); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { void load(); }, []);
+
+  const save = async (event: FormEvent) => {
+    event.preventDefault(); setSaving(true); setError('');
+    try {
+      const saved = await socialLinkService.update(links.map(({ id, url, enabled }) => ({ id, url, enabled })));
+      setLinks(saved);
+      toast.success('Social links are live ✦');
+    } catch (cause) { setError(contentError(cause)); }
+    finally { setSaving(false); }
+  };
+
+  const change = (id: number, patch: Partial<Pick<SocialLink, 'url' | 'enabled'>>) => {
+    setLinks((current) => current.map((link) => link.id === id ? { ...link, ...patch } : link));
+  };
 
   return (
     <>
       <AdminModuleBar
         title="Social Links"
         sub="Connect your storefront to social"
-        actions={<button type="button" className="adm-btn primary" onClick={() => toast.success('Links saved ✦')}>Save changes</button>}
+        actions={<button type="submit" form="social-links-form" className="adm-btn primary" disabled={loading || saving}>{saving ? 'Publishing…' : 'Save changes'}</button>}
       />
       <AdminBody>
         <div className="adm-card">
           <div className="adm-card-head"><span className="adm-card-title">Social profiles</span></div>
           <div className="adm-card-body">
-            {SOCIAL.map(([name, handle, icon]) => (
-              <div className="adm-field" key={name}>
-                <label>{icon} {name}</label>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <input style={{ flex: 1 }} defaultValue={handle} />
-                  <AdminToggle on={enabled[name]} onToggle={() => setEnabled((prev) => ({ ...prev, [name]: !prev[name] }))} />
+            {loading ? <div className="badm-loading">Loading social profiles…</div> : <form id="social-links-form" onSubmit={(event) => void save(event)}>
+              {links.map((link) => (
+                <div className="adm-field" key={link.id}>
+                  <label>{SOCIAL_ICONS[link.icon] || '🔗'} {link.displayName}</label>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <input type="url" style={{ flex: 1 }} value={link.url} maxLength={2048} required
+                      onChange={(event) => change(link.id, { url: event.target.value })} />
+                    <AdminToggle on={link.enabled} onToggle={() => change(link.id, { enabled: !link.enabled })} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </form>}
+            {error && <div className="qadm-error" role="alert">{error}</div>}
           </div>
         </div>
-        <AdminDemoNote />
       </AdminBody>
     </>
   );

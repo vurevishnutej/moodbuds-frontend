@@ -34,6 +34,8 @@ interface UpdateCartItemPayload {
   size?: string;
 }
 
+interface MoveToWishlistResponse { cart: CartResponse }
+
 /**
  * Convert API CartResponse to frontend Cart format
  */
@@ -68,8 +70,8 @@ export const httpCartApi: CartApi = {
    * GET /customer/cart - Get authenticated customer's cart
    */
   async getCart(): Promise<Cart> {
-    const response = await apiClient.get<CartResponse>('/customer/cart');
-    return mapCartResponse(response);
+    const response = await apiClient.post<CouponCartResponse>('/customer/cart/coupon/validate');
+    return mapCartResponse(response.cart, response);
   },
 
   /**
@@ -120,6 +122,13 @@ export const httpCartApi: CartApi = {
       code,
     });
     return mapCartResponse(response.cart, response);
+  },
+
+  async moveToWishlist(itemId: string): Promise<Cart> {
+    const response = await apiClient.post<MoveToWishlistResponse>(
+      `/customer/cart/items/${itemId}/move-to-wishlist`,
+    );
+    return mapCartResponse(response.cart);
   },
 
   async removePromoCode(): Promise<Cart> {
