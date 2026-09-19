@@ -64,7 +64,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
           className="pd-acc-head"
           onClick={() => setIsOpen(!isOpen)}
         >
-          Customer Reviews ({totalElements}) <span className="pd-acc-icon">{isOpen ? '−' : '+'}</span>
+          Customer Reviews {isOpen && `(${totalElements})`} <span className="pd-acc-icon">{isOpen ? '−' : '+'}</span>
         </button>
         {isOpen && (
           <div className="pd-acc-body">

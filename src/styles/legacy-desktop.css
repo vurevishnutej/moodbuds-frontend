@@ -1723,40 +1723,40 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 
 /* Main 2-col layout */
 .pd-body{
-  max-width:1320px;margin:0 auto;
-  padding:clamp(20px,3vw,36px) clamp(20px,4vw,52px) 80px;
+  max-width:1080px;margin:0 auto;
+  padding:clamp(14px,2vw,24px) clamp(12px,2.5vw,32px) 48px;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:clamp(32px,5vw,72px);
+  grid-template-columns:1fr 0.95fr;
+  gap:clamp(20px,3vw,36px);
   align-items:start;
 }
 
 /* Left column: Gallery + Reviews */
 .pd-left{
-  display:flex;flex-direction:column;gap:clamp(32px,5vw,72px);
+  display:flex;flex-direction:column;gap:clamp(28px,4vw,48px);
 }
 
 /* ── Left: Image gallery ── */
-.pd-gallery{display:flex;gap:12px;}
+.pd-gallery{display:flex;gap:10px;}
 .pd-thumbs{
-  display:flex;flex-direction:column;gap:8px;
-  width:72px;flex-shrink:0;
+  display:flex;flex-direction:column;gap:6px;
+  width:60px;flex-shrink:0;
 }
 .pd-thumb{
-  width:72px;height:88px;
-  border:1.5px solid transparent;
+  width:60px;height:75px;
+  border:1px solid transparent;
   overflow:hidden;cursor:pointer;
   background:#f4f4f4;
   transition:border-color 0.18s;
   flex-shrink:0;
 }
 .pd-thumb img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
-.pd-thumb.active{border-color:#000;}
+.pd-thumb.active{border-color:#8b3a52;}
 .pd-thumb:hover{border-color:#aaa;}
 .pd-main-img{
   flex:1;
   position:relative;
-  aspect-ratio:3/4;
+  aspect-ratio:2.4/4;
   background:#f4f4f4;
   overflow:hidden;
 }
@@ -1783,8 +1783,8 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 
 /* ── Right: Info ── */
 .pd-info{}
-.pd-info-brand{font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:#bbb;margin-bottom:6px;}
-.pd-info-name{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,34px);font-weight:400;color:#000;line-height:1.15;margin-bottom:14px;}
+.pd-info-brand{font-size:9px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:#bbb;margin-bottom:4px;}
+.pd-info-name{font-family:'Playfair Display',serif;font-size:clamp(20px,2.8vw,30px);font-weight:400;color:#000;line-height:1.15;margin-bottom:10px;}
 
 /* Price row */
 .pd-price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
@@ -1828,7 +1828,7 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 .pd-size-guide{font-size:11px;color:#aaa;text-decoration:underline;cursor:pointer;margin-bottom:20px;display:inline-block;background:none;border:none;font-family:'Inter',sans-serif;}
 
 /* Qty */
-.pd-qty-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.pd-qty-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
 .pd-qty-label{font-size:10px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:#aaa;}
 .pd-qty-ctrl{display:flex;align-items:center;gap:0;border:1px solid #e0e0e0;}
 .pd-qty-btn{width:38px;height:38px;background:#fff;border:none;font-size:18px;color:#666;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.18s;font-family:'Inter',sans-serif;}
@@ -1836,7 +1836,7 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 .pd-qty-val{width:44px;text-align:center;font-size:13px;font-weight:500;color:#000;border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0;height:38px;line-height:38px;}
 
 /* CTA buttons */
-.pd-cta{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.pd-cta{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
 .pd-btn-cart{
   width:100%;padding:15px;background:#8b3a52;color:#fff;border:none;
   font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
@@ -1857,12 +1857,12 @@ body.view-profile{overflow-x:hidden;background:#fff;}
 
 /* Delivery info strip */
 .pd-delivery{
-  display:flex;flex-direction:column;gap:10px;
-  padding:16px 0;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;
-  margin-bottom:24px;
+  display:flex;flex-direction:column;gap:8px;
+  padding:12px 0;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;
+  margin-bottom:18px;
 }
-.pd-del-row{display:flex;align-items:center;gap:10px;font-size:12px;color:#666;}
-.pd-del-icon{font-size:16px;flex-shrink:0;}
+.pd-del-row{display:flex;align-items:center;gap:8px;font-size:11px;color:#777;}
+.pd-del-icon{font-size:14px;flex-shrink:0;}
 
 /* Accordion details */
 .pd-accordion{border-top:1px solid #e8e8e8;}
