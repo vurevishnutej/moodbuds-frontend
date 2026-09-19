@@ -1731,6 +1731,11 @@ body.view-profile{overflow-x:hidden;background:#fff;}
   align-items:start;
 }
 
+/* Left column: Gallery + Reviews */
+.pd-left{
+  display:flex;flex-direction:column;gap:clamp(32px,5vw,72px);
+}
+
 /* ── Left: Image gallery ── */
 .pd-gallery{display:flex;gap:12px;}
 .pd-thumbs{

@@ -88,7 +88,10 @@ export function ProductDetailsPage() {
       </div>
 
       <div className="pd-body">
-        <ProductGallery product={product} />
+        <div className="pd-left">
+          <ProductGallery product={product} />
+          <ProductReviewsSection productSlug={product.id} pageSize={3} />
+        </div>
 
         <div className="pd-info">
           <div className="pd-info-brand">{product.brand}</div>
@@ -175,8 +178,6 @@ export function ProductDetailsPage() {
               { title: 'Shipping & returns', body: 'Standard delivery 3–5 days. Express delivery 1–2 days. Free returns within 30 days. Items must be unworn with tags attached.' },
             ]}
           />
-
-          <ProductReviewsSection productSlug={product.id} pageSize={3} />
         </div>
       </div>
 
