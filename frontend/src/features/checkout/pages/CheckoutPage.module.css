@@ -3,6 +3,12 @@
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
   color: #0f0f0f;
+  position: relative;
+}
+
+/* Remove emoji backgrounds */
+#view-checkout .view-emoji-bg {
+  display: none !important;
 }
 
 #checkout-page {
