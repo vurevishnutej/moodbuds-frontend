@@ -27,68 +27,57 @@ interface ProductReviewsSectionProps {
 }
 
 export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductReviewsSectionProps) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [displayedCount, setDisplayedCount] = useState(0);
+  const [allReviews, setAllReviews] = useState<Review[]>([]);
+  const [page, setPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [allReviewsLoaded, setAllReviewsLoaded] = useState<Review[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const loadMoreReviews = async () => {
-    if (displayedCount === 0) {
-      // First load
-      setLoading(true);
-      setError(null);
-      try {
-        let page = 0;
-        let allReviews: Review[] = [];
-        let hasMorePages = true;
+  const loadAllReviews = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      let allReviewsData: Review[] = [];
+      let pageNum = 0;
+      let hasMore = true;
 
-        while (hasMorePages) {
-          const response = await apiClient.get<ReviewsPageResponse>(`/products/${productSlug}/reviews?page=${page}&size=${pageSize}`);
-          allReviews = [...allReviews, ...response.content];
-          hasMorePages = page + 1 < response.totalPages;
-          page++;
-        }
-
-        setAllReviewsLoaded(allReviews);
-        setTotalElements(allReviews.length);
-        setReviews(allReviews.slice(0, pageSize));
-        setDisplayedCount(pageSize);
-        setHasMore(allReviews.length > pageSize);
-      } catch {
-        setError('Could not load reviews');
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Load more - slide up and show next batch
-      const nextCount = Math.min(displayedCount + pageSize, allReviewsLoaded.length);
-      setReviews(allReviewsLoaded.slice(0, nextCount));
-
-      // Smooth scroll animation
-      if (containerRef.current) {
-        containerRef.current.style.scrollBehavior = 'smooth';
-        containerRef.current.scrollTop = pageSize * 100;
+      while (hasMore) {
+        const response = await apiClient.get<ReviewsPageResponse>(`/products/${productSlug}/reviews?page=${pageNum}&size=${pageSize}`);
+        allReviewsData = [...allReviewsData, ...response.content];
+        hasMore = pageNum + 1 < response.totalPages;
+        pageNum++;
       }
 
-      setDisplayedCount(nextCount);
-      setHasMore(nextCount < allReviewsLoaded.length);
+      setAllReviews(allReviewsData);
+      setTotalElements(allReviewsData.length);
+    } catch {
+      setError('Could not load reviews');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const loadMore = async () => {
-    await loadMoreReviews();
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+
+    // Scroll to top of container smoothly
+    setTimeout(() => {
+      containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
   };
 
   useEffect(() => {
-    if (isOpen && displayedCount === 0) {
-      void loadMoreReviews();
+    if (isOpen && allReviews.length === 0) {
+      void loadAllReviews();
     }
   }, [isOpen, productSlug, pageSize]);
+
+  const displayedReviews = allReviews.slice(page * pageSize, (page + 1) * pageSize);
+  const hasMore = (page + 1) * pageSize < allReviews.length;
+  const displayedCount = Math.min((page + 1) * pageSize, allReviews.length);
 
   return (
     <div className="pd-accordion">
@@ -106,12 +95,12 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
               <div className="reviews-loading">Loading reviews...</div>
             ) : error ? (
               <div className="reviews-error">{error}</div>
-            ) : reviews.length === 0 ? (
+            ) : allReviews.length === 0 ? (
               <div className="reviews-empty">No reviews yet. Be the first to review!</div>
             ) : (
               <>
                 <div className="reviews-container" ref={containerRef}>
-                  {reviews.map((review) => (
+                  {displayedReviews.map((review) => (
                     <div key={review.id} className="review-card">
                       <div className="review-header">
                         <div className="review-avatar">{review.userInitial}</div>
@@ -134,7 +123,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
                 </div>
 
                 <div className="reviews-footer">
-                  <div className="reviews-count">Showing {reviews.length} of {totalElements} reviews</div>
+                  <div className="reviews-count">Showing {displayedCount} of {totalElements} reviews</div>
                   {hasMore && (
                     <button
                       type="button"
@@ -142,7 +131,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
                       onClick={loadMore}
                       disabled={loading}
                     >
-                      {loading ? 'Loading...' : 'Load more'}
+                      Load more
                     </button>
                   )}
                 </div>
