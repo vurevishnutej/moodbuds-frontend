@@ -32,6 +32,8 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
 
   const loadReviews = async () => {
     setLoading(true);
@@ -40,6 +42,7 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
       const response = await apiClient.get<ReviewsPageResponse>(`/products/${productSlug}/reviews?page=${page}&size=${pageSize}`);
       setReviews(response.content);
       setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
     } catch {
       setError('Could not load reviews');
     } finally {
@@ -48,77 +51,84 @@ export function ProductReviewsSection({ productSlug, pageSize = 3 }: ProductRevi
   };
 
   useEffect(() => {
-    void loadReviews();
-  }, [page, productSlug, pageSize]);
-
-  if (error) {
-    return (
-      <div className="product-reviews-error">
-        <p>{error}</p>
-      </div>
-    );
-  }
+    if (isOpen) {
+      void loadReviews();
+    }
+  }, [page, productSlug, pageSize, isOpen]);
 
   return (
-    <div className="product-reviews-section">
-      <h3 className="reviews-title">Customer Reviews</h3>
-
-      {loading ? (
-        <div className="reviews-loading">Loading reviews...</div>
-      ) : reviews.length === 0 ? (
-        <div className="reviews-empty">No reviews yet. Be the first to review!</div>
-      ) : (
-        <>
-          <div className="reviews-list">
-            {reviews.map((review) => (
-              <div key={review.id} className="review-card">
-                <div className="review-header">
-                  <div className="review-avatar">{review.userInitial}</div>
-                  <div className="review-meta">
-                    <div className="review-rating">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className={`star${i < review.rating ? ' filled' : ''}`}>★</span>
-                      ))}
+    <div className="pd-accordion">
+      <div className={`pd-acc-item${isOpen ? ' open' : ''}`}>
+        <button
+          type="button"
+          className="pd-acc-head"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          Customer Reviews ({totalElements}) <span className="pd-acc-icon">{isOpen ? '−' : '+'}</span>
+        </button>
+        {isOpen && (
+          <div className="pd-acc-body">
+            {loading ? (
+              <div className="reviews-loading">Loading reviews...</div>
+            ) : error ? (
+              <div className="reviews-error">{error}</div>
+            ) : reviews.length === 0 ? (
+              <div className="reviews-empty">No reviews yet. Be the first to review!</div>
+            ) : (
+              <>
+                <div className="reviews-list">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="review-card">
+                      <div className="review-header">
+                        <div className="review-avatar">{review.userInitial}</div>
+                        <div className="review-meta">
+                          <div className="review-rating">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span key={i} className={`star${i < review.rating ? ' filled' : ''}`}>★</span>
+                            ))}
+                          </div>
+                          <div className="review-title">{review.title}</div>
+                          {review.verifiedPurchase && <span className="verified-badge">✓ Verified</span>}
+                        </div>
+                      </div>
+                      {review.comment && <p className="review-comment">{review.comment}</p>}
+                      <div className="review-footer">
+                        <span className="review-date">{new Date(review.createdAt).toLocaleDateString('en-IN')}</span>
+                      </div>
                     </div>
-                    <div className="review-title">{review.title}</div>
-                    {review.verifiedPurchase && <span className="verified-badge">✓ Verified Purchase</span>}
-                  </div>
+                  ))}
                 </div>
-                {review.comment && <p className="review-comment">{review.comment}</p>}
-                <div className="review-footer">
-                  <span className="review-date">{new Date(review.createdAt).toLocaleDateString('en-IN')}</span>
-                </div>
-              </div>
-            ))}
-          </div>
 
-          {totalPages > 1 && (
-            <div className="reviews-pagination">
-              <button
-                type="button"
-                className="pagination-btn prev"
-                disabled={page === 0}
-                onClick={() => setPage(page - 1)}
-              >
-                ← Previous
-              </button>
-              <span className="pagination-info">
-                <span className="page-number">{page + 1}</span>
-                <span className="page-separator">/</span>
-                <span className="total-pages">{totalPages}</span>
-              </span>
-              <button
-                type="button"
-                className="pagination-btn next"
-                disabled={page >= totalPages - 1}
-                onClick={() => setPage(page + 1)}
-              >
-                Next →
-              </button>
-            </div>
-          )}
-        </>
-      )}
+                {totalPages > 1 && (
+                  <div className="reviews-pagination">
+                    <button
+                      type="button"
+                      className="pagination-btn prev"
+                      disabled={page === 0}
+                      onClick={() => setPage(page - 1)}
+                    >
+                      ← Previous
+                    </button>
+                    <span className="pagination-info">
+                      <span className="page-number">{page + 1}</span>
+                      <span className="page-separator">/</span>
+                      <span className="total-pages">{totalPages}</span>
+                    </span>
+                    <button
+                      type="button"
+                      className="pagination-btn next"
+                      disabled={page >= totalPages - 1}
+                      onClick={() => setPage(page + 1)}
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
